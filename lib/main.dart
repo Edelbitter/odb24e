@@ -1,11 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:connectivity/connectivity.dart';
+import 'package:adhara_socket_io/adhara_socket_io.dart';
+
 
 
 void main() => runApp(MyApp());
 
+const String URI = "http://192.168.0.10:35000/";
+
 class MyApp extends StatelessWidget {
   // This widget is the root of your application.
+
+
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -47,20 +54,133 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   String _counter = "";
+  String _otherDisplay = "init";
 
-void _setString(String res)
-{
-  _counter = res;
-}
+  // for connectivity
+  var subscription;
+
+  // for sockets
+  List<String> toPrint = ["trying to conenct"];
+  SocketIOManager manager;
+  SocketIO socket;
+  bool isProbablyConnected = false;
+
+  @override
+  initState() {
+    super.initState();
+
+    // subscribe to network changes
+    subscription = Connectivity().onConnectivityChanged.listen((ConnectivityResult result) {
+      // Got a new connectivity status!
+      setState(()
+      {
+        this._otherDisplay = "loading";
+      });
+
+      if(result != null)
+      setState(()
+      {
+        this._otherDisplay = result.toString();
+      });
+    });
+
+    // start socket things
+    manager = SocketIOManager();
+    initSocket();
+
+  }
+
+// Be sure to cancel subscription after you are done
+  @override
+  dispose() {
+    super.dispose();
+
+    subscription.cancel();
+  }
+
+  // copied from example
+  initSocket() async {
+    setState(() => isProbablyConnected = true);
+    socket = await manager.createInstance(
+      //Socket IO server URI
+        URI,
+        //Query params - can be used for authentication
+        query: {
+          "auth": "--SOME AUTH STRING---",
+          "info": "new connection from adhara-socketio",
+          "timestamp": DateTime.now().toString()
+        },
+        //Enable or disable platform channel logging
+        enableLogging: false,
+      //  transports: [Transports.WEB_SOCKET, Transports.POLLING] //Enable required transport
+    );
+    socket.onConnect((data) {
+      pprint("connected...");
+      pprint(data);
+//      socket.emit("message", ["Hello world!"]);
+    });
+    socket.onConnectError(pprint);
+    socket.onConnectTimeout(pprint);
+    socket.onError(pprint);
+    socket.onDisconnect(pprint);
+    socket.on("news", (data) {
+      pprint("news");
+      pprint(data);
+    });
+    socket.on(eventName, listener)
+    socket.connect();
+  }
+
+// copied from example
+  disconnect() async {
+    await manager.clearInstance(socket);
+    setState(() => isProbablyConnected = false);
+  }
+
+
+  pprint(data) {
+    setState(() {
+      if (data is Map) {
+      //  data = json.encode(data);
+      }
+      print(data);
+      toPrint.add(data);
+    });
+  }
 
 void _getDisplaySync()
 {
-  setState(()
-  {
+ // setState(()
+ // {
     this._counter=
     "loading...";
-    Connectivity().checkConnectivity().then((res){this._counter=res.toString();});
-  });
+    Connectivity().checkConnectivity().then((res)
+    {
+      if(res == ConnectivityResult.mobile)
+        {
+          setState(()
+          {
+            this._counter= "mobile";
+          });
+        }
+
+      else if(res == ConnectivityResult.wifi)
+        {
+          this._counter = "wifi with SSID ";
+          Connectivity().getWifiName().then((name)
+          {
+            this._counter += name + " and IP ";
+            Connectivity().getWifiIP().then((ip)
+            {
+              setState(()
+              {
+                this._counter += ip;
+              });
+            });
+          });
+        }
+    });
+  //});
 }
 
   Future<void> _getDisplay()  async
@@ -118,7 +238,7 @@ void _getDisplaySync()
               'You have pushed the button this many times:',
             ),
             Text(
-               _counter,
+               this._otherDisplay ?? "horst",
               style: Theme.of(context).textTheme.display1,
 
 

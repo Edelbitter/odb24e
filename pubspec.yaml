@@ -25,6 +25,7 @@ dependencies:
   cupertino_icons: ^0.1.2
   connectivity: ^0.4.3+2
   async: ^2.1.0
+  adhara_socket_io: ^0.1.11
 
 dev_dependencies:
   flutter_test:
