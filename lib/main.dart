@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:connectivity/connectivity.dart';
+
 
 void main() => runApp(MyApp());
 
@@ -44,18 +46,39 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
+  String _counter = "";
 
-  void _incrementCounter() {
-    setState(() {
-      // This call to setState tells the Flutter framework that something has
-      // changed in this State, which causes it to rerun the build method below
-      // so that the display can reflect the updated values. If we changed
-      // _counter without calling setState(), then the build method would not be
-      // called again, and so nothing would appear to happen.
-      _counter++;
-    });
+void _setString(String res)
+{
+  _counter = res;
+}
+
+void _getDisplaySync()
+{
+  setState(()
+  {
+    this._counter=
+    "loading...";
+    Connectivity().checkConnectivity().then((res){this._counter=res.toString();});
+  });
+}
+
+  Future<void> _getDisplay()  async
+  {
+
+    var connectivityResult = await  Connectivity().checkConnectivity();
+    if (connectivityResult == ConnectivityResult.mobile) {
+      // I am connected to a mobile network.
+      this._counter = "mobil";
+    } else if (connectivityResult == ConnectivityResult.wifi) {
+      // I am connected to a wifi network.
+     this._counter = "wifi";
+    }
+    else{
+      this._counter = "nothing?";
+    }
   }
+
 
   @override
   Widget build(BuildContext context) {
@@ -95,14 +118,19 @@ class _MyHomePageState extends State<MyHomePage> {
               'You have pushed the button this many times:',
             ),
             Text(
-              '$_counter',
+               _counter,
               style: Theme.of(context).textTheme.display1,
+
+
             ),
+
+
           ],
         ),
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
+      //  onPressed: await  _getDisplay(),
+        onPressed: _getDisplaySync,
         tooltip: 'Increment',
         child: Icon(Icons.add),
       ), // This trailing comma makes auto-formatting nicer for build methods.
