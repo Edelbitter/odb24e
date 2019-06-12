@@ -1,12 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:connectivity/connectivity.dart';
-import 'package:adhara_socket_io/adhara_socket_io.dart';
+
+import 'dart:io';
+import 'dart:convert';
 
 
 
 void main() => runApp(MyApp());
 
-const String URI = "http://192.168.0.10:35000/";
+const String URI = "http://192.168.20.179:35000/";
+//const String URI = "http://192.168.0.10:35000/";
 
 class MyApp extends StatelessWidget {
   // This widget is the root of your application.
@@ -58,12 +61,9 @@ class _MyHomePageState extends State<MyHomePage> {
 
   // for connectivity
   var subscription;
-
+  var theSocket;
   // for sockets
-  List<String> toPrint = ["trying to conenct"];
-  SocketIOManager manager;
-  SocketIO socket;
-  bool isProbablyConnected = false;
+
 
   @override
   initState() {
@@ -80,16 +80,42 @@ class _MyHomePageState extends State<MyHomePage> {
       if(result != null)
       setState(()
       {
-        this._otherDisplay = result.toString();
+      //  this._otherDisplay = result.toString();
       });
     });
 
-    // start socket things
-    manager = SocketIOManager();
-    initSocket();
+
+    Socket.connect('192.168.20.179', 35000).then((socket) {
+      //socket.write('Hello, World!');
+      theSocket = socket;
+      theSocket.done.then((flupp){print('done happened');print(flupp.toString());});
+      theSocket.listen(dataHandler,onError: errorHandler,onDone:doneHandler);
+      setState(()
+      {
+        _otherDisplay = "connected";
+        print('connected');
+      });
+    });
 
   }
+  void dataHandler(data){
+   // print(data);
+    String rec= (new String.fromCharCodes(data).trim());
+    print(rec);
+    if(rec.contains('>'))
+    setState(()
+    {
+      _otherDisplay = "received >!!";
+    });
+  }
 
+  void errorHandler(error, StackTrace trace){
+    print(error);
+  }
+
+  void doneHandler(){
+    theSocket.destroy();
+  }
 // Be sure to cancel subscription after you are done
   @override
   dispose() {
@@ -99,59 +125,24 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   // copied from example
-  initSocket() async {
-    setState(() => isProbablyConnected = true);
-    socket = await manager.createInstance(
-      //Socket IO server URI
-        URI,
-        //Query params - can be used for authentication
-        query: {
-          "auth": "--SOME AUTH STRING---",
-          "info": "new connection from adhara-socketio",
-          "timestamp": DateTime.now().toString()
-        },
-        //Enable or disable platform channel logging
-        enableLogging: false,
-      //  transports: [Transports.WEB_SOCKET, Transports.POLLING] //Enable required transport
-    );
-    socket.onConnect((data) {
-      pprint("connected...");
-      pprint(data);
-//      socket.emit("message", ["Hello world!"]);
-    });
-    socket.onConnectError(pprint);
-    socket.onConnectTimeout(pprint);
-    socket.onError(pprint);
-    socket.onDisconnect(pprint);
-    socket.on("news", (data) {
-      pprint("news");
-      pprint(data);
-    });
-    //socket.on(eventName, listener)
-    socket.connect();
-  }
-
-// copied from example
-  disconnect() async {
-    await manager.clearInstance(socket);
-    setState(() => isProbablyConnected = false);
-  }
 
 
-  pprint(data) {
-    setState(() {
-      if (data is Map) {
-      //  data = json.encode(data);
-      }
-      print(data);
-      toPrint.add(data);
-    });
-  }
 
-void _getDisplaySync()
-{
+
+void _getDisplaySync() {
+  //theSocket.write('hello server<EOF>');
+  String foo = 'Hello world';
+  List<int> bytes = utf8.encode(foo);
+  theSocket.add(bytes);
+ // print('button pressed');
+ // print(theSocket.port.toString());
+}
+
+
  // setState(()
  // {
+  void _otherFunc()
+  {
     this._counter=
     "loading...";
     Connectivity().checkConnectivity().then((res)
