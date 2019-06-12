@@ -75,6 +75,20 @@ class _MyHomePageState extends State<MyHomePage> {
       setState(()
       {
         this._otherDisplay = "loading";
+        print(result);
+        print('connecting now');
+
+        Socket.connect('192.168.0.10', 35000).then((socket) {
+          //socket.write('Hello, World!');
+          theSocket = socket;
+          theSocket.listen(dataHandler,onError: errorHandler,onDone:doneHandler);
+          setState(()
+          {
+            _otherDisplay = "connected";
+            print('connected');
+          });
+        }).catchError((err){print(err);});
+
       });
 
       if(result != null)
@@ -84,17 +98,6 @@ class _MyHomePageState extends State<MyHomePage> {
       });
     });
 
-
-    Socket.connect('192.168.0.10', 35000).then((socket) {
-      //socket.write('Hello, World!');
-      theSocket = socket;
-      theSocket.listen(dataHandler,onError: errorHandler,onDone:doneHandler);
-      setState(()
-      {
-        _otherDisplay = "connected";
-        print('connected');
-      });
-    });
 
   }
   void dataHandler(data){
