@@ -8,7 +8,7 @@ import 'dart:convert';
 
 void main() => runApp(MyApp());
 
-const String URI = "http://192.168.20.179:35000/";
+const String URI = "http://192.168.0.10:35000/";
 //const String URI = "http://192.168.0.10:35000/";
 
 class MyApp extends StatelessWidget {
@@ -85,10 +85,9 @@ class _MyHomePageState extends State<MyHomePage> {
     });
 
 
-    Socket.connect('192.168.20.179', 35000).then((socket) {
+    Socket.connect('192.168.0.10', 35000).then((socket) {
       //socket.write('Hello, World!');
       theSocket = socket;
-      theSocket.done.then((flupp){print('done happened');print(flupp.toString());});
       theSocket.listen(dataHandler,onError: errorHandler,onDone:doneHandler);
       setState(()
       {
@@ -102,10 +101,10 @@ class _MyHomePageState extends State<MyHomePage> {
    // print(data);
     String rec= (new String.fromCharCodes(data).trim());
     print(rec);
-    if(rec.contains('>'))
+    //if(rec.contains('>'))
     setState(()
     {
-      _otherDisplay = "received >!!";
+      _otherDisplay = "received \n" + rec;
     });
   }
 
@@ -131,7 +130,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
 void _getDisplaySync() {
   //theSocket.write('hello server<EOF>');
-  String foo = 'Hello world';
+  String foo = '01 05\r';
   List<int> bytes = utf8.encode(foo);
   theSocket.add(bytes);
  // print('button pressed');
@@ -225,9 +224,7 @@ void _getDisplaySync() {
           // horizontal).
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            Text(
-              'You have pushed the button this many times:',
-            ),
+
             Text(
                this._otherDisplay ?? "horst",
               style: Theme.of(context).textTheme.display1,
