@@ -100,7 +100,13 @@ class _MyHomePageState extends State<MyHomePage> {
   }
   void dataHandler(data){
    // print(data);
-    print(new String.fromCharCodes(data).trim());
+    String rec= (new String.fromCharCodes(data).trim());
+    print(rec);
+    if(rec.contains('>'))
+    setState(()
+    {
+      _otherDisplay = "received >!!";
+    });
   }
 
   void errorHandler(error, StackTrace trace){
