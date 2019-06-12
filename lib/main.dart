@@ -127,7 +127,7 @@ class _MyHomePageState extends State<MyHomePage> {
       pprint("news");
       pprint(data);
     });
-    socket.on(eventName, listener)
+    //socket.on(eventName, listener)
     socket.connect();
   }
 
