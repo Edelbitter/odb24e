@@ -5,6 +5,7 @@ import 'dart:io';
 import 'dart:convert';
 
 import 'settings.dart';
+import 'dashboard.dart';
 
 
 void main() => runApp(MyApp());
@@ -51,6 +52,7 @@ class MyApp extends StatelessWidget {
       routes: {
         '/': (context) => MyHomePage(title: 'zooom OBDII'),
         '/settings': (context) => SettingsPage(),
+        '/dashboard':(context) => DashboardPage(),
       },
     //  home: MyHomePage(title: 'zooom OBDII'),
     );
@@ -260,6 +262,17 @@ void _sendData() {
           // horizontal).
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
+
+            RaisedButton(
+              child:  Text("Dashboard"),
+              shape: new RoundedRectangleBorder(borderRadius: new BorderRadius.circular(10.0)),
+
+              onPressed: (){Navigator.pushNamed( context, '/dashboard');},
+              // color: Colors.red,
+              // textColor: Colors.yellow,
+              padding: EdgeInsets.fromLTRB(10, 10, 10, 10),
+              // splashColor: Colors.grey,
+            ),
 
             Text(
                this._otherDisplay ?? "horst",
