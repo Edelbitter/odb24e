@@ -95,7 +95,6 @@ class _MyHomePageState extends State<MyHomePage> {
     // subscribe to network changes
     subscription = Connectivity().onConnectivityChanged.listen((ConnectivityResult result) {
       // Got a new connectivity status!
-
       if(result != null)
         {
           if(result == ConnectivityResult.mobile)this.network = 'mobile';
@@ -107,7 +106,6 @@ class _MyHomePageState extends State<MyHomePage> {
       //  this._otherDisplay = result.toString();
       });
     });
-
 
 
 
