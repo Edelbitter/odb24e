@@ -4,22 +4,23 @@ import 'package:connectivity/connectivity.dart';
 import 'dart:io';
 import 'dart:convert';
 
+import 'settings.dart';
 
 
 void main() => runApp(MyApp());
 
-const String URI = "http://192.168.0.10:35000/";
+ String URIIP = '';
+ int PORT = 0;
+
 //const String URI = "http://192.168.0.10:35000/";
 
 class MyApp extends StatelessWidget {
   // This widget is the root of your application.
-
-
-
   @override
   Widget build(BuildContext context) {
+
     return MaterialApp(
-      title: 'Flutter Demo',
+      title: 'zooommm',
       theme: ThemeData(
         // This is the theme of your application.
         //
@@ -30,10 +31,31 @@ class MyApp extends StatelessWidget {
         // or simply save your changes to "hot reload" in a Flutter IDE).
         // Notice that the counter didn't reset back to zero; the application
         // is not restarted.
-        primarySwatch: Colors.blue,
+       // primarySwatch: Colors.black87,
+        brightness: Brightness.dark,
+        primaryColor: Colors.lightBlue[800],
+        accentColor: Colors.cyan[600],
+
+        // Define the default font family.
+        fontFamily: 'Montserrat',
+
+        // Define the default TextTheme. Use this to specify the default
+        // text styling for headlines, titles, bodies of text, and more.
+        textTheme: TextTheme(
+          headline: TextStyle(fontSize: 72.0, fontWeight: FontWeight.bold),
+          title: TextStyle(fontSize: 36.0, fontStyle: FontStyle.italic),
+          body1: TextStyle(fontSize: 14.0, fontFamily: 'Hind',color: Colors.white),
+        ),
       ),
-      home: MyHomePage(title: 'Flutter Demo Home Page'),
+      initialRoute: '/',
+      routes: {
+        '/': (context) => MyHomePage(title: 'zooom OBDII'),
+        '/settings': (context) => SettingsPage(),
+      },
+    //  home: MyHomePage(title: 'zooom OBDII'),
     );
+
+
   }
 }
 
@@ -57,11 +79,12 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   String _counter = "";
-  String _otherDisplay = "init";
+  String _otherDisplay = "^_^";
 
   // for connectivity
   var subscription;
   var theSocket;
+  String network ="";
   // for sockets
 
 
@@ -72,12 +95,13 @@ class _MyHomePageState extends State<MyHomePage> {
     // subscribe to network changes
     subscription = Connectivity().onConnectivityChanged.listen((ConnectivityResult result) {
       // Got a new connectivity status!
-      setState(()
-      {
-        this._otherDisplay = "loading";
-      });
 
       if(result != null)
+        {
+          if(result == ConnectivityResult.mobile)this.network = 'mobile';
+          else if(result == ConnectivityResult.wifi) this.network = 'wifi';
+          else this.network = 'none';
+        }
       setState(()
       {
       //  this._otherDisplay = result.toString();
@@ -85,16 +109,7 @@ class _MyHomePageState extends State<MyHomePage> {
     });
 
 
-    Socket.connect('192.168.0.10', 35000).then((socket) {
-      //socket.write('Hello, World!');
-      theSocket = socket;
-      theSocket.listen(dataHandler,onError: errorHandler,onDone:doneHandler);
-      setState(()
-      {
-        _otherDisplay = "connected";
-        print('connected');
-      });
-    });
+
 
   }
   void dataHandler(data){
@@ -115,6 +130,22 @@ class _MyHomePageState extends State<MyHomePage> {
   void doneHandler(){
     theSocket.destroy();
   }
+
+  void _connect()
+  {
+    String uri = URIIP.length>3 ? URIIP : '192.168.0.10';
+    int port = PORT == 0 ? 35000 : PORT;
+    Socket.connect(uri, port).then((socket) {
+      //socket.write('Hello, World!');
+      theSocket = socket;
+      theSocket.listen(dataHandler,onError: errorHandler,onDone:doneHandler);
+      setState(()
+      {
+        _otherDisplay = "connected";
+        print('connected');
+      });
+    });
+  }
 // Be sure to cancel subscription after you are done
   @override
   dispose() {
@@ -128,7 +159,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
 
 
-void _getDisplaySync() {
+void _sendData() {
   //theSocket.write('hello server<EOF>');
   String foo = '01 05\r';
   List<int> bytes = utf8.encode(foo);
@@ -204,7 +235,14 @@ void _getDisplaySync() {
         // the App.build method, and use it to set our appbar title.
         title: Text(widget.title),
       ),
-      body: Center(
+      body: Container(
+      decoration: BoxDecoration(
+        image: DecorationImage(
+          image: ExactAssetImage('images/motorCroppedDark.png'),
+          fit: BoxFit.fill,
+      ),
+      ),
+      child: Center(
         // Center is a layout widget. It takes a single child and positions it
         // in the middle of the parent.
         child: Column(
@@ -231,16 +269,39 @@ void _getDisplaySync() {
 
 
             ),
+            Column(
+              children: <Widget>[
+                Container(
+                  margin: EdgeInsets.only(left:15,right: 15),
+                  child:   RaisedButton(
+                    child:  Text("Kommunikation starten"),
+                    shape: new RoundedRectangleBorder(borderRadius: new BorderRadius.circular(10.0)),
 
+                  onPressed: (this.network == 'wifi') ? _connect : null,
+                 // color: Colors.red,
+                 // textColor: Colors.yellow,
+                  padding: EdgeInsets.fromLTRB(10, 10, 10, 10),
+                 // splashColor: Colors.grey,
+                ),
+                ),
+                Text(
+                  this.network == 'wifi' ? '' : 'Der OBDII-Stecker ist nicht verbunden',
+
+                )
+              ],
+            )
 
           ],
         ),
       ),
+      ),
       floatingActionButton: FloatingActionButton(
       //  onPressed: await  _getDisplay(),
-        onPressed: _getDisplaySync,
-        tooltip: 'Increment',
-        child: Icon(Icons.add),
+        onPressed: (){
+          Navigator.pushNamed( context, '/settings');
+        },
+        tooltip: 'Einstellungen',
+        child: Icon(Icons.settings),
       ), // This trailing comma makes auto-formatting nicer for build methods.
     );
   }
