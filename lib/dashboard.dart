@@ -22,8 +22,15 @@ class DashboardState extends State<DashboardPage>
   void brrumm()
   {
     Timer.periodic(Duration(milliseconds: 500), (timer) {
+      print(speed);
+      setState((){
       speed += 0.1;
-      if(speed>2)timer.cancel();
+        });
+      if (speed > 2)
+    {
+      timer.cancel();
+      speed=0;
+    }
     });
   }
 
