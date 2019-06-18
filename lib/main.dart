@@ -10,8 +10,8 @@ import 'dashboard.dart';
 
 void main() => runApp(MyApp());
 
- String URIIP = '';
- int PORT = 0;
+ String URIIP = '192.168.0.10';
+ int PORT = 35000;
 
 //const String URI = "http://192.168.0.10:35000/";
 

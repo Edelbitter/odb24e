@@ -20,7 +20,14 @@ class SettingsState extends State<SettingsPage>
   @override
   Widget build(BuildContext context) {
 
-    return Scaffold(
+    return Container(
+        decoration: BoxDecoration(
+          image: DecorationImage(
+          image: ExactAssetImage('images/gears.jpg'),
+          fit: BoxFit.cover,),),
+        child:
+      Scaffold(
+        backgroundColor: Colors.transparent,
         appBar: AppBar(
 
           automaticallyImplyLeading: true,
@@ -31,12 +38,14 @@ class SettingsState extends State<SettingsPage>
           title: Text('Einstellungen'),
         ),
         body: Container(
-          decoration: BoxDecoration(
-            image: DecorationImage(
-              image: ExactAssetImage('images/gears.jpg'),
-              fit: BoxFit.fill,
-            ),
-          ),
+
+           // decoration: BoxDecoration(
+           // image: DecorationImage(
+           //   image: ExactAssetImage('images/gears.jpg'),
+           //   fit: BoxFit.cover,
+//
+        //    ),
+        //  ),
           child: Column(
             children: <Widget>[
 
@@ -56,9 +65,10 @@ class SettingsState extends State<SettingsPage>
                 ),
                   new Expanded(
                     child:
-                    TextField(
+                    TextFormField(
+                      initialValue: '192.168.0.10',
                       textDirection: TextDirection.rtl,
-                      onSubmitted: (res){URIIP = res;},
+                      onFieldSubmitted: (res){URIIP = res;},
                       maxLength: 15,
                       decoration: InputDecoration(
                         border: OutlineInputBorder(),
@@ -86,9 +96,11 @@ class SettingsState extends State<SettingsPage>
                     ),
                     new Expanded(
                       child:
-                      TextField(
+                      TextFormField(
+                        initialValue: '35000',
                         textDirection: TextDirection.rtl,
-                        onSubmitted: (res){PORT = int.parse(res);},
+                        onFieldSubmitted: (res){PORT = int.parse(res);},
+
                         maxLength: 5,
                         decoration: InputDecoration(
                           border: OutlineInputBorder(),
@@ -102,7 +114,7 @@ class SettingsState extends State<SettingsPage>
 
           ],
     ),
-    ),
+    ),),
     );
 
 
