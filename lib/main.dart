@@ -91,6 +91,10 @@ class _MyHomePageState extends State<MyHomePage> {
 
   bool ready = false;
 
+  String speed = '';
+  String gasPedal = '';
+  String gear = '';
+
 
   @override
   initState() {
@@ -122,6 +126,23 @@ class _MyHomePageState extends State<MyHomePage> {
     setState(()
     {
       _otherDisplay = "received \n" + rec;
+
+      if(rec.startsWith('41'))
+        {
+          if(rec.startsWith('5A',3))
+            {
+              gasPedal = (int.parse( rec.substring(5,6)) * 100 / 255).toString();
+            }
+          if(rec.startsWith('0D',3))
+          {
+            speed =  rec.substring(5,6);
+          }
+          if(rec.startsWith('5A',3))
+          {
+            gear =  rec.substring(5);
+          }
+        }
+
     });
     if(rec.contains('>'))
     {
@@ -164,27 +185,19 @@ class _MyHomePageState extends State<MyHomePage> {
   // copied from example
 
 
-
+void _sendOut(String toSend)
+{
+  ready = false;
+  List<int> bytes = utf8.encode(toSend);
+  theSocket.add(bytes);
+}
 
 void _send1() {
-  //theSocket.write('hello server<EOF>');
-  ready = false;
-  print('sending');
-  String foo = '01 05\r';
-  List<int> bytes = utf8.encode(foo);
-  theSocket.add(bytes);
- // print('button pressed');
- // print(theSocket.port.toString());
+ _sendOut('01 05\r');
 }
 
   void _send2() {
-    ready = false;
-    //theSocket.write('hello server<EOF>');
-    String foo = '01 07\r';
-    List<int> bytes = utf8.encode(foo);
-    theSocket.add(bytes);
-    // print('button pressed');
-    // print(theSocket.port.toString());
+    _sendOut('01 07\r');
   }
 
  // setState(()
@@ -330,19 +343,48 @@ void _send1() {
                     // splashColor: Colors.grey,
                   ),
                 ),
+
                 Container(
                   margin: EdgeInsets.only(left:15,right: 15),
                   child:   RaisedButton(
                     child:  Text("send 2"),
                     shape: new RoundedRectangleBorder(borderRadius: new BorderRadius.circular(10.0)),
-
                     onPressed: (this.network == 'wifi' && ready==true) ? _send2 : null,
-                    // color: Colors.red,
-                    // textColor: Colors.yellow,
                     padding: EdgeInsets.fromLTRB(10, 10, 10, 10),
-                    // splashColor: Colors.grey,
                   ),
                 ),
+
+                Container(
+                  margin: EdgeInsets.only(left:15,right: 15),
+                  child:   RaisedButton(
+                    child:  Text("get Gear"),//4
+                    shape: new RoundedRectangleBorder(borderRadius: new BorderRadius.circular(10.0)),
+                    onPressed: (this.network == 'wifi' && ready==true) ? (){_sendOut('01 A4\r');} : null,
+                    padding: EdgeInsets.fromLTRB(10, 10, 10, 10),
+                  ),
+                ),
+                Text(gear),
+                Container(
+                  margin: EdgeInsets.only(left:15,right: 15),
+                  child:   RaisedButton(
+                    child:  Text("gaspedalposi"),//1
+                    shape: new RoundedRectangleBorder(borderRadius: new BorderRadius.circular(10.0)),
+                    onPressed: (this.network == 'wifi' && ready==true) ? (){_sendOut('01 5A\r');} : null,
+                    padding: EdgeInsets.fromLTRB(10, 10, 10, 10),
+                  ),
+                ),
+                Text(gasPedal),
+                Container(
+                  margin: EdgeInsets.only(left:15,right: 15),
+                  child:   RaisedButton(
+                    child:  Text("geschwindigkeit"),//1
+                    shape: new RoundedRectangleBorder(borderRadius: new BorderRadius.circular(10.0)),
+                    onPressed: (this.network == 'wifi' && ready==true) ? (){_sendOut('01 0D\r');} : null,
+                    padding: EdgeInsets.fromLTRB(10, 10, 10, 10),
+                  ),
+                ),
+                Text(speed),
+
               ],
             )
 
