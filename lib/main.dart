@@ -89,11 +89,13 @@ class _MyHomePageState extends State<MyHomePage> {
   String network ="";
   // for sockets
 
+  bool ready = false;
+
 
   @override
   initState() {
     super.initState();
-
+  ready = true;
     // subscribe to network changes
     subscription = Connectivity().onConnectivityChanged.listen((ConnectivityResult result) {
       // Got a new connectivity status!
@@ -116,11 +118,15 @@ class _MyHomePageState extends State<MyHomePage> {
    // print(data);
     String rec= (new String.fromCharCodes(data).trim());
     print(rec);
-    //if(rec.contains('>'))
+
     setState(()
     {
       _otherDisplay = "received \n" + rec;
     });
+    if(rec.contains('>'))
+    {
+      ready = true;
+    }
   }
 
   void errorHandler(error, StackTrace trace){
@@ -142,6 +148,7 @@ class _MyHomePageState extends State<MyHomePage> {
       setState(()
       {
         _otherDisplay = "connected";
+        ready=true;
         print('connected');
       });
     });
@@ -159,8 +166,10 @@ class _MyHomePageState extends State<MyHomePage> {
 
 
 
-void _sendData() {
+void _send1() {
   //theSocket.write('hello server<EOF>');
+  ready = false;
+  print('sending');
   String foo = '01 05\r';
   List<int> bytes = utf8.encode(foo);
   theSocket.add(bytes);
@@ -168,6 +177,15 @@ void _sendData() {
  // print(theSocket.port.toString());
 }
 
+  void _send2() {
+    ready = false;
+    //theSocket.write('hello server<EOF>');
+    String foo = '01 07\r';
+    List<int> bytes = utf8.encode(foo);
+    theSocket.add(bytes);
+    // print('button pressed');
+    // print(theSocket.port.toString());
+  }
 
  // setState(()
  // {
@@ -298,7 +316,33 @@ void _sendData() {
                 Text(
                   this.network == 'wifi' ? '' : 'Der OBDII-Stecker ist nicht verbunden',
 
-                )
+                ),
+                Container(
+                  margin: EdgeInsets.only(left:15,right: 15),
+                  child:   RaisedButton(
+                    child:  Text("send 1"),
+                    shape: new RoundedRectangleBorder(borderRadius: new BorderRadius.circular(10.0)),
+
+                    onPressed: (this.network == 'wifi' && ready==true) ? _send1 : null,
+                    // color: Colors.red,
+                    // textColor: Colors.yellow,
+                    padding: EdgeInsets.fromLTRB(10, 10, 10, 10),
+                    // splashColor: Colors.grey,
+                  ),
+                ),
+                Container(
+                  margin: EdgeInsets.only(left:15,right: 15),
+                  child:   RaisedButton(
+                    child:  Text("send 2"),
+                    shape: new RoundedRectangleBorder(borderRadius: new BorderRadius.circular(10.0)),
+
+                    onPressed: (this.network == 'wifi' && ready==true) ? _send2 : null,
+                    // color: Colors.red,
+                    // textColor: Colors.yellow,
+                    padding: EdgeInsets.fromLTRB(10, 10, 10, 10),
+                    // splashColor: Colors.grey,
+                  ),
+                ),
               ],
             )
 
