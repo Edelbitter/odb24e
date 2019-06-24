@@ -94,6 +94,8 @@ class _MyHomePageState extends State<MyHomePage> {
   String speed = '';
   String gasPedal = '';
   String gear = '';
+  
+  String userInput;
 
 
   @override
@@ -171,6 +173,7 @@ class _MyHomePageState extends State<MyHomePage> {
         _otherDisplay = "connected";
         ready=true;
         print('connected');
+        _sendOut('AT E0\r');
       });
     });
   }
@@ -190,6 +193,8 @@ void _sendOut(String toSend)
   ready = false;
   List<int> bytes = utf8.encode(toSend);
   theSocket.add(bytes);
+  print(toSend);
+  print('\n');
 }
 
 void _send1() {
@@ -333,14 +338,24 @@ void _send1() {
                 Container(
                   margin: EdgeInsets.only(left:15,right: 15),
                   child:   RaisedButton(
-                    child:  Text("send 1"),
+                    child:  Text("send custom"),
                     shape: new RoundedRectangleBorder(borderRadius: new BorderRadius.circular(10.0)),
 
-                    onPressed: (this.network == 'wifi' && ready==true) ? _send1 : null,
+                    onPressed: (this.network == 'wifi' && ready==true) ? (){_sendOut(userInput.trim()+'\r');} : null,
                     // color: Colors.red,
                     // textColor: Colors.yellow,
                     padding: EdgeInsets.fromLTRB(10, 10, 10, 10),
                     // splashColor: Colors.grey,
+                  ),
+                ),
+                TextFormField(
+                  
+                  textDirection: TextDirection.rtl,
+                  onFieldSubmitted: (res){userInput = res;},
+                  
+                  decoration: InputDecoration(
+                      border: OutlineInputBorder(),
+                      
                   ),
                 ),
 
