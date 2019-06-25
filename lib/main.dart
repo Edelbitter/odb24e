@@ -127,29 +127,32 @@ class _MyHomePageState extends State<MyHomePage> {
 
     setState(()
     {
-      _otherDisplay = "received \n" + rec;
-
-      if(rec.startsWith('41'))
-        {
-          if(rec.startsWith('5A',3))
-            {
-              gasPedal = (int.parse( rec.substring(5,6)) * 100 / 255).toString();
-            }
-          if(rec.startsWith('0D',3))
-          {
-            speed =  rec.substring(5,6);
-          }
-          if(rec.startsWith('5A',3))
-          {
-            gear =  rec.substring(5);
-          }
-        }
+      if(rec.contains('>'))
+      {
+        ready = true;
+      }
+      if(rec.length>2)
+      {
+        _otherDisplay = "received \n" + rec;
+      }
+//      if(rec.startsWith('41'))
+//        {
+//          if(rec.startsWith('5A',3))
+//            {
+//              gasPedal = (int.parse( rec.substring(5,6)) * 100 / 255).toString();
+//            }
+//          if(rec.startsWith('0D',3))
+//          {
+//            speed =  rec.substring(5,6);
+//          }
+//          if(rec.startsWith('5A',3))
+//          {
+//            gear =  rec.substring(5);
+//          }
+//        }
 
     });
-    if(rec.contains('>'))
-    {
-      ready = true;
-    }
+
   }
 
   void errorHandler(error, StackTrace trace){
