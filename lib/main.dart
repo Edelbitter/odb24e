@@ -353,7 +353,7 @@ void _send1() {
                 ),
                 TextFormField(
                   
-                  textDirection: TextDirection.rtl,
+                  textDirection: TextDirection.ltr,
                   onFieldSubmitted: (res){userInput = res;},
                   
                   decoration: InputDecoration(
