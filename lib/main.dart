@@ -3,7 +3,6 @@ import 'package:connectivity/connectivity.dart';
 import 'package:flutter_blue/flutter_blue.dart';
 import 'package:flutter_bluetooth_serial/flutter_bluetooth_serial.dart';
 
-
 import 'dart:io';
 import 'dart:convert';
 
@@ -102,6 +101,8 @@ class _MyHomePageState extends State<MyHomePage> {
   FlutterBlue bTooth = FlutterBlue.instance;
   FlutterBluetoothSerial bluetooth = FlutterBluetoothSerial.instance;
   var device;
+  bool btReady = false;
+  var btConnection;
 
 
   @override
@@ -133,19 +134,17 @@ class _MyHomePageState extends State<MyHomePage> {
   }
   void dataHandler(data){
    // print(data);
-    String rec= (new String.fromCharCodes(data).trim());
-    print(rec);
+    if(data != null) {
+      String rec = (new String.fromCharCodes(data).trim());
+      print(rec);
 
-    setState(()
-    {
-      if(rec.contains('>'))
-      {
-        ready = true;
-      }
-      if(rec.length>2)
-      {
-        _otherDisplay = "received \n" + rec;
-      }
+      setState(() {
+        if (rec.contains('>')) {
+          ready = true;
+        }
+        if (rec.length > 2) {
+          _otherDisplay = "received \n" + rec;
+        }
 //      if(rec.startsWith('41'))
 //        {
 //          if(rec.startsWith('5A',3))
@@ -162,8 +161,8 @@ class _MyHomePageState extends State<MyHomePage> {
 //          }
 //        }
 
-    });
-
+      });
+    }
   }
 
   void errorHandler(error, StackTrace trace){
@@ -183,11 +182,11 @@ class _MyHomePageState extends State<MyHomePage> {
 
     bluetooth.getBondedDevices().then((dev){
       print('the devices');
-      print(dev.toString());
       for(var d in dev)
       {
         print(d.name);
-        if(d.name == 'UniCarScan')
+        //if(d.name == 'UniCarScan')
+        if(d.name=='UniCarScan')
           {
             device = d;
             setState(() {
@@ -195,11 +194,39 @@ class _MyHomePageState extends State<MyHomePage> {
               ready = true;
 
               print('unicar gefunden');
+              print(d.connected);
 
               bluetooth.onStateChanged().listen((state) {print('state changed'); print(state);});
+              btReady = true;
 
-              bluetooth.connect(device).then((res){print(res.toString());});
-              bluetooth.write(message)
+              // Some simplest connection :F
+              try {
+                 BluetoothConnection.toAddress(d.address).then((connection){
+                print('Connected to the device');
+
+                connection.input.listen(dataHandler,onError: (){print('cannot connect');}
+//                        (Uint8List data) {
+//                  print('Data incoming: ${ascii.decode(data)}');
+//                  connection.output.add(data); // Sending data
+//
+//                  if (ascii.decode(data).contains('!')) {
+//                    connection.finish(); // Closing connection
+//                    print('Disconnecting by local host');
+//                  }
+//                }
+                ).onDone(() {
+                  print('Disconnected by remote request');
+                });
+              });
+              }
+              catch (exception) {
+                print('Cannot connect, exception occured');
+              }
+
+
+
+
+              //bluetooth.write(message)
 
             });
           }
@@ -238,9 +265,11 @@ class _MyHomePageState extends State<MyHomePage> {
 
 void _sendOut(String toSend)
 {
-  ready = false;
+  //ready = false;
   List<int> bytes = utf8.encode(toSend);
-  theSocket.add(bytes);
+ // theSocket.add(bytes);
+  btConnection.output.add(bytes);
+  //bluetooth.writeBytes(bytes);
   print(toSend);
   print('\n');
 }
@@ -313,19 +342,27 @@ void _send1() {
     // The Flutter framework has been optimized to make rerunning build methods
     // fast, so that you can just rebuild anything that needs updating rather
     // than having to individually change instances of widgets.
-    return Scaffold(
+    return Container(
+        decoration: BoxDecoration(
+         image: DecorationImage(
+            image: ExactAssetImage('images/motorCroppedDark.png'),
+            fit: BoxFit.cover,),
+        ),
+      child:
+      Scaffold(
+        backgroundColor: Colors.transparent,
       appBar: AppBar(
         // Here we take the value from the MyHomePage object that was created by
         // the App.build method, and use it to set our appbar title.
         title: Text(widget.title),
       ),
       body: Container(
-      decoration: BoxDecoration(
-        image: DecorationImage(
-          image: ExactAssetImage('images/motorCroppedDark.png'),
-          fit: BoxFit.fill,
-      ),
-      ),
+      //decoration: BoxDecoration(
+       // image: DecorationImage(
+      //    image: ExactAssetImage('images/motorCroppedDark.png'),
+       //   fit: BoxFit.fill,
+     // ),
+     // ),
       child: Center(
         // Center is a layout widget. It takes a single child and positions it
         // in the middle of the parent.
@@ -389,14 +426,18 @@ void _send1() {
                     child:  Text("send custom"),
                     shape: new RoundedRectangleBorder(borderRadius: new BorderRadius.circular(10.0)),
 
-                    onPressed: (this.network == 'wifi' && ready==true) ? (){_sendOut(userInput.trim()+'\r');} : null,
+                    onPressed: (btReady == true ) ? (){_sendOut(userInput.trim()+'\r');} : null,
                     // color: Colors.red,
                     // textColor: Colors.yellow,
                     padding: EdgeInsets.fromLTRB(10, 10, 10, 10),
                     // splashColor: Colors.grey,
                   ),
                 ),
-                TextFormField(
+                Container(
+
+                  margin: EdgeInsets.only(left:15,right: 15),
+
+                child: TextFormField(
                   
                   textDirection: TextDirection.ltr,
                   onFieldSubmitted: (res){userInput = res;},
@@ -406,47 +447,8 @@ void _send1() {
                       
                   ),
                 ),
-
-                Container(
-                  margin: EdgeInsets.only(left:15,right: 15),
-                  child:   RaisedButton(
-                    child:  Text("send 2"),
-                    shape: new RoundedRectangleBorder(borderRadius: new BorderRadius.circular(10.0)),
-                    onPressed: (this.network == 'wifi' && ready==true) ? _send2 : null,
-                    padding: EdgeInsets.fromLTRB(10, 10, 10, 10),
-                  ),
                 ),
 
-                Container(
-                  margin: EdgeInsets.only(left:15,right: 15),
-                  child:   RaisedButton(
-                    child:  Text("get Gear"),//4
-                    shape: new RoundedRectangleBorder(borderRadius: new BorderRadius.circular(10.0)),
-                    onPressed: (this.network == 'wifi' && ready==true) ? (){_sendOut('01 A4\r');} : null,
-                    padding: EdgeInsets.fromLTRB(10, 10, 10, 10),
-                  ),
-                ),
-                Text(gear),
-                Container(
-                  margin: EdgeInsets.only(left:15,right: 15),
-                  child:   RaisedButton(
-                    child:  Text("gaspedalposi"),//1
-                    shape: new RoundedRectangleBorder(borderRadius: new BorderRadius.circular(10.0)),
-                    onPressed: (this.network == 'wifi' && ready==true) ? (){_sendOut('01 5A\r');} : null,
-                    padding: EdgeInsets.fromLTRB(10, 10, 10, 10),
-                  ),
-                ),
-                Text(gasPedal),
-                Container(
-                  margin: EdgeInsets.only(left:15,right: 15),
-                  child:   RaisedButton(
-                    child:  Text("geschwindigkeit"),//1
-                    shape: new RoundedRectangleBorder(borderRadius: new BorderRadius.circular(10.0)),
-                    onPressed: (this.network == 'wifi' && ready==true) ? (){_sendOut('01 0D\r');} : null,
-                    padding: EdgeInsets.fromLTRB(10, 10, 10, 10),
-                  ),
-                ),
-                Text(speed),
 
               ],
             )
@@ -455,6 +457,7 @@ void _send1() {
         ),
       ),
       ),
+
       floatingActionButton: FloatingActionButton(
       //  onPressed: await  _getDisplay(),
         onPressed: (){
@@ -463,6 +466,6 @@ void _send1() {
         tooltip: 'Einstellungen',
         child: Icon(Icons.settings),
       ), // This trailing comma makes auto-formatting nicer for build methods.
-    );
+    ));
   }
 }
