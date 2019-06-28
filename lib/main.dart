@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:connectivity/connectivity.dart';
+import 'package:flutter_blue/flutter_blue.dart';
+import 'package:flutter_bluetooth_serial/flutter_bluetooth_serial.dart';
+
 
 import 'dart:io';
 import 'dart:convert';
@@ -96,6 +99,9 @@ class _MyHomePageState extends State<MyHomePage> {
   String gear = '';
   
   String userInput;
+  FlutterBlue bTooth = FlutterBlue.instance;
+  FlutterBluetoothSerial bluetooth = FlutterBluetoothSerial.instance;
+  var device;
 
 
   @override
@@ -103,6 +109,7 @@ class _MyHomePageState extends State<MyHomePage> {
     super.initState();
   ready = true;
     // subscribe to network changes
+    if(false)
     subscription = Connectivity().onConnectivityChanged.listen((ConnectivityResult result) {
       // Got a new connectivity status!
       if(result != null)
@@ -116,6 +123,10 @@ class _MyHomePageState extends State<MyHomePage> {
       //  this._otherDisplay = result.toString();
       });
     });
+
+    /// Start scanning
+    ///
+
 
 
 
@@ -163,22 +174,56 @@ class _MyHomePageState extends State<MyHomePage> {
     theSocket.destroy();
   }
 
+
+
+
   void _connect()
   {
-    String uri = URIIP.length>3 ? URIIP : '192.168.0.10';
-    int port = PORT == 0 ? 35000 : PORT;
-    Socket.connect(uri, port).then((socket) {
-      //socket.write('Hello, World!');
-      theSocket = socket;
-      theSocket.listen(dataHandler,onError: errorHandler,onDone:doneHandler);
-      setState(()
+
+
+    bluetooth.getBondedDevices().then((dev){
+      print('the devices');
+      print(dev.toString());
+      for(var d in dev)
       {
-        _otherDisplay = "connected";
-        ready=true;
-        print('connected');
-        _sendOut('AT E0\r');
-      });
+        print(d.name);
+        if(d.name == 'UniCarScan')
+          {
+            device = d;
+            setState(() {
+              _otherDisplay = "UniCar gefunden";
+              ready = true;
+
+              print('unicar gefunden');
+
+              bluetooth.onStateChanged().listen((state) {print('state changed'); print(state);});
+
+              bluetooth.connect(device).then((res){print(res.toString());});
+              bluetooth.write(message)
+
+            });
+          }
+      }
     });
+    //var scanSubscription = bTooth.state;
+    //print(scanSubscription);
+
+    if(false) {
+      String uri = URIIP.length > 3 ? URIIP : '192.168.0.10';
+      int port = PORT == 0 ? 35000 : PORT;
+      Socket.connect(uri, port).then((socket) {
+        //socket.write('Hello, World!');
+        theSocket = socket;
+        theSocket.listen(
+            dataHandler, onError: errorHandler, onDone: doneHandler);
+        setState(() {
+          _otherDisplay = "connected";
+          ready = true;
+          print('connected');
+          _sendOut('AT E0\r');
+        });
+      });
+    }
   }
 // Be sure to cancel subscription after you are done
   @override
@@ -327,7 +372,7 @@ void _send1() {
                     child:  Text("Kommunikation starten"),
                     shape: new RoundedRectangleBorder(borderRadius: new BorderRadius.circular(10.0)),
 
-                  onPressed: (this.network == 'wifi') ? _connect : null,
+                  onPressed:  _connect ,
                  // color: Colors.red,
                  // textColor: Colors.yellow,
                   padding: EdgeInsets.fromLTRB(10, 10, 10, 10),
