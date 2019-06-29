@@ -9,11 +9,10 @@ import 'dart:convert';
 import 'settings.dart';
 import 'dashboard.dart';
 
-
 void main() => runApp(MyApp());
 
- String URIIP = '192.168.0.10';
- int PORT = 35000;
+String URIIP = '192.168.0.10';
+int PORT = 35000;
 
 //const String URI = "http://192.168.0.10:35000/";
 
@@ -21,7 +20,6 @@ class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-
     return MaterialApp(
       title: 'zooommm',
       theme: ThemeData(
@@ -34,7 +32,7 @@ class MyApp extends StatelessWidget {
         // or simply save your changes to "hot reload" in a Flutter IDE).
         // Notice that the counter didn't reset back to zero; the application
         // is not restarted.
-       // primarySwatch: Colors.black87,
+        // primarySwatch: Colors.black87,
         brightness: Brightness.dark,
         primaryColor: Colors.lightBlue[800],
         accentColor: Colors.cyan[600],
@@ -47,19 +45,18 @@ class MyApp extends StatelessWidget {
         textTheme: TextTheme(
           headline: TextStyle(fontSize: 72.0, fontWeight: FontWeight.bold),
           title: TextStyle(fontSize: 36.0, fontStyle: FontStyle.italic),
-          body1: TextStyle(fontSize: 14.0, fontFamily: 'Hind',color: Colors.white),
+          body1: TextStyle(
+              fontSize: 14.0, fontFamily: 'Hind', color: Colors.white),
         ),
       ),
       initialRoute: '/',
       routes: {
         '/': (context) => MyHomePage(title: 'zooom OBDII'),
         '/settings': (context) => SettingsPage(),
-        '/dashboard':(context) => DashboardPage(),
+        '/dashboard': (context) => DashboardPage(),
       },
-    //  home: MyHomePage(title: 'zooom OBDII'),
+      //  home: MyHomePage(title: 'zooom OBDII'),
     );
-
-
   }
 }
 
@@ -88,7 +85,7 @@ class _MyHomePageState extends State<MyHomePage> {
   // for connectivity
   var subscription;
   var theSocket;
-  String network ="";
+  String network = "";
   // for sockets
 
   bool ready = false;
@@ -96,7 +93,7 @@ class _MyHomePageState extends State<MyHomePage> {
   String speed = '';
   String gasPedal = '';
   String gear = '';
-  
+
   String userInput;
   FlutterBlue bTooth = FlutterBlue.instance;
   FlutterBluetoothSerial bluetooth = FlutterBluetoothSerial.instance;
@@ -104,46 +101,50 @@ class _MyHomePageState extends State<MyHomePage> {
   bool btReady = false;
   var btConnection;
 
-
   @override
   initState() {
     super.initState();
-  ready = true;
+    ready = true;
     // subscribe to network changes
-    if(false)
-    subscription = Connectivity().onConnectivityChanged.listen((ConnectivityResult result) {
-      // Got a new connectivity status!
-      if(result != null)
-        {
-          if(result == ConnectivityResult.mobile)this.network = 'mobile';
-          else if(result == ConnectivityResult.wifi) this.network = 'wifi';
-          else this.network = 'none';
+    if (false)
+      subscription = Connectivity()
+          .onConnectivityChanged
+          .listen((ConnectivityResult result) {
+        // Got a new connectivity status!
+        if (result != null) {
+          if (result == ConnectivityResult.mobile)
+            this.network = 'mobile';
+          else if (result == ConnectivityResult.wifi)
+            this.network = 'wifi';
+          else
+            this.network = 'none';
         }
-      setState(()
-      {
-      //  this._otherDisplay = result.toString();
+        setState(() {
+          //  this._otherDisplay = result.toString();
+        });
       });
-    });
 
     /// Start scanning
     ///
-
-
-
-
   }
-  void dataHandler(data){
-   // print(data);
-    if(data != null) {
-      String rec = (new String.fromCharCodes(data).trim());
+
+  void dataHandler(data) {
+    // print(data);
+    if (data != null) {
+      String rec = (new String.fromCharCodes(data));
       print(rec);
+      String rec2 = ascii.decode(data);
+      // print('------------------');
+      //print(rec2);
 
       setState(() {
         if (rec.contains('>')) {
           ready = true;
         }
-        if (rec.length > 2) {
+        if (_otherDisplay.contains(">")) {
           _otherDisplay = "received \n" + rec;
+        } else {
+          _otherDisplay += rec;
         }
 //      if(rec.startsWith('41'))
 //        {
@@ -160,51 +161,48 @@ class _MyHomePageState extends State<MyHomePage> {
 //            gear =  rec.substring(5);
 //          }
 //        }
-
       });
     }
   }
 
-  void errorHandler(error, StackTrace trace){
+  void errorHandler(error, StackTrace trace) {
     print(error);
   }
 
-  void doneHandler(){
+  void doneHandler() {
     theSocket.destroy();
   }
 
-
-
-
-  void _connect()
-  {
-
-
-    bluetooth.getBondedDevices().then((dev){
+  void _connect() {
+    bluetooth.getBondedDevices().then((dev) {
       print('the devices');
-      for(var d in dev)
-      {
+      for (var d in dev) {
         print(d.name);
         //if(d.name == 'UniCarScan')
-        if(d.name=='UniCarScan')
-          {
-            device = d;
-            setState(() {
-              _otherDisplay = "UniCar gefunden";
-              ready = true;
+        if (d.name == 'UniCarScan') {
+          device = d;
+          setState(() {
+            _otherDisplay = "UniCar gefunden";
+            ready = true;
 
-              print('unicar gefunden');
-              print(d.connected);
+            print('unicar gefunden');
+            print(d.connected);
 
-              bluetooth.onStateChanged().listen((state) {print('state changed'); print(state);});
-              btReady = true;
-
-              // Some simplest connection :F
-              try {
-                 BluetoothConnection.toAddress(d.address).then((connection){
+            bluetooth.onStateChanged().listen((state) {
+              print('state changed');
+              print(state);
+            });
+            btReady = true;
+            // Some simplest connection :F
+            try {
+              BluetoothConnection.toAddress(d.address).then((connection) {
                 print('Connected to the device');
+                btConnection = connection;
 
-                connection.input.listen(dataHandler,onError: (){print('cannot connect');}
+                connection.input.listen(dataHandler, onError: (err) {
+                  print('cannot connect');
+                  print(err.toString());
+                }
 //                        (Uint8List data) {
 //                  print('Data incoming: ${ascii.decode(data)}');
 //                  connection.output.add(data); // Sending data
@@ -214,35 +212,30 @@ class _MyHomePageState extends State<MyHomePage> {
 //                    print('Disconnecting by local host');
 //                  }
 //                }
-                ).onDone(() {
+                    ).onDone(() {
                   print('Disconnected by remote request');
                 });
               });
-              }
-              catch (exception) {
-                print('Cannot connect, exception occured');
-              }
+            } catch (exception) {
+              print('Cannot connect, exception occured');
+            }
 
-
-
-
-              //bluetooth.write(message)
-
-            });
-          }
+            //bluetooth.write(message)
+          });
+        }
       }
     });
     //var scanSubscription = bTooth.state;
     //print(scanSubscription);
 
-    if(false) {
+    if (false) {
       String uri = URIIP.length > 3 ? URIIP : '192.168.0.10';
       int port = PORT == 0 ? 35000 : PORT;
       Socket.connect(uri, port).then((socket) {
         //socket.write('Hello, World!');
         theSocket = socket;
-        theSocket.listen(
-            dataHandler, onError: errorHandler, onDone: doneHandler);
+        theSocket.listen(dataHandler,
+            onError: errorHandler, onDone: doneHandler);
         setState(() {
           _otherDisplay = "connected";
           ready = true;
@@ -252,6 +245,7 @@ class _MyHomePageState extends State<MyHomePage> {
       });
     }
   }
+
 // Be sure to cancel subscription after you are done
   @override
   dispose() {
@@ -262,77 +256,60 @@ class _MyHomePageState extends State<MyHomePage> {
 
   // copied from example
 
+  void _sendOut(String toSend) {
+    //ready = false;
+    List<int> bytes = utf8.encode(toSend);
+    // theSocket.add(bytes);
+    btConnection.output.add(bytes);
+    //bluetooth.writeBytes(bytes);
+    print(toSend);
+    print('\n');
+  }
 
-void _sendOut(String toSend)
-{
-  //ready = false;
-  List<int> bytes = utf8.encode(toSend);
- // theSocket.add(bytes);
-  btConnection.output.add(bytes);
-  //bluetooth.writeBytes(bytes);
-  print(toSend);
-  print('\n');
-}
-
-void _send1() {
- _sendOut('01 05\r');
-}
+  void _send1() {
+    _sendOut('01 05\r');
+  }
 
   void _send2() {
     _sendOut('01 07\r');
   }
 
- // setState(()
- // {
-  void _otherFunc()
-  {
-    this._counter=
-    "loading...";
-    Connectivity().checkConnectivity().then((res)
-    {
-      if(res == ConnectivityResult.mobile)
-        {
-          setState(()
-          {
-            this._counter= "mobile";
-          });
-        }
-
-      else if(res == ConnectivityResult.wifi)
-        {
-          this._counter = "wifi with SSID ";
-          Connectivity().getWifiName().then((name)
-          {
-            this._counter += name + " and IP ";
-            Connectivity().getWifiIP().then((ip)
-            {
-              setState(()
-              {
-                this._counter += ip;
-              });
+  // setState(()
+  // {
+  void _otherFunc() {
+    this._counter = "loading...";
+    Connectivity().checkConnectivity().then((res) {
+      if (res == ConnectivityResult.mobile) {
+        setState(() {
+          this._counter = "mobile";
+        });
+      } else if (res == ConnectivityResult.wifi) {
+        this._counter = "wifi with SSID ";
+        Connectivity().getWifiName().then((name) {
+          this._counter += name + " and IP ";
+          Connectivity().getWifiIP().then((ip) {
+            setState(() {
+              this._counter += ip;
             });
           });
-        }
+        });
+      }
     });
-  //});
-}
+    //});
+  }
 
-  Future<void> _getDisplay()  async
-  {
-
-    var connectivityResult = await  Connectivity().checkConnectivity();
+  Future<void> _getDisplay() async {
+    var connectivityResult = await Connectivity().checkConnectivity();
     if (connectivityResult == ConnectivityResult.mobile) {
       // I am connected to a mobile network.
       this._counter = "mobil";
     } else if (connectivityResult == ConnectivityResult.wifi) {
       // I am connected to a wifi network.
-     this._counter = "wifi";
-    }
-    else{
+      this._counter = "wifi";
+    } else {
       this._counter = "nothing?";
     }
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -344,128 +321,128 @@ void _send1() {
     // than having to individually change instances of widgets.
     return Container(
         decoration: BoxDecoration(
-         image: DecorationImage(
+          image: DecorationImage(
             image: ExactAssetImage('images/motorCroppedDark.png'),
-            fit: BoxFit.cover,),
+            fit: BoxFit.cover,
+          ),
         ),
-      child:
-      Scaffold(
-        backgroundColor: Colors.transparent,
-      appBar: AppBar(
-        // Here we take the value from the MyHomePage object that was created by
-        // the App.build method, and use it to set our appbar title.
-        title: Text(widget.title),
-      ),
-      body: Container(
-      //decoration: BoxDecoration(
-       // image: DecorationImage(
-      //    image: ExactAssetImage('images/motorCroppedDark.png'),
-       //   fit: BoxFit.fill,
-     // ),
-     // ),
-      child: Center(
-        // Center is a layout widget. It takes a single child and positions it
-        // in the middle of the parent.
-        child: Column(
-          // Column is also layout widget. It takes a list of children and
-          // arranges them vertically. By default, it sizes itself to fit its
-          // children horizontally, and tries to be as tall as its parent.
-          //
-          // Invoke "debug painting" (press "p" in the console, choose the
-          // "Toggle Debug Paint" action from the Flutter Inspector in Android
-          // Studio, or the "Toggle Debug Paint" command in Visual Studio Code)
-          // to see the wireframe for each widget.
-          //
-          // Column has various properties to control how it sizes itself and
-          // how it positions its children. Here we use mainAxisAlignment to
-          // center the children vertically; the main axis here is the vertical
-          // axis because Columns are vertical (the cross axis would be
-          // horizontal).
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
+        child: Scaffold(
+          backgroundColor: Colors.transparent,
+          appBar: AppBar(
+            // Here we take the value from the MyHomePage object that was created by
+            // the App.build method, and use it to set our appbar title.
+            title: Text(widget.title),
+          ),
+          body: Container(
+            //decoration: BoxDecoration(
+            // image: DecorationImage(
+            //    image: ExactAssetImage('images/motorCroppedDark.png'),
+            //   fit: BoxFit.fill,
+            // ),
+            // ),
+            child: Center(
+              // Center is a layout widget. It takes a single child and positions it
+              // in the middle of the parent.
+              child: Column(
+                // Column is also layout widget. It takes a list of children and
+                // arranges them vertically. By default, it sizes itself to fit its
+                // children horizontally, and tries to be as tall as its parent.
+                //
+                // Invoke "debug painting" (press "p" in the console, choose the
+                // "Toggle Debug Paint" action from the Flutter Inspector in Android
+                // Studio, or the "Toggle Debug Paint" command in Visual Studio Code)
+                // to see the wireframe for each widget.
+                //
+                // Column has various properties to control how it sizes itself and
+                // how it positions its children. Here we use mainAxisAlignment to
+                // center the children vertically; the main axis here is the vertical
+                // axis because Columns are vertical (the cross axis would be
+                // horizontal).
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: <Widget>[
+                  RaisedButton(
+                    child: Text("Dashboard"),
+                    shape: new RoundedRectangleBorder(
+                        borderRadius: new BorderRadius.circular(10.0)),
 
-            RaisedButton(
-              child:  Text("Dashboard"),
-              shape: new RoundedRectangleBorder(borderRadius: new BorderRadius.circular(10.0)),
-
-              onPressed: (){Navigator.pushNamed( context, '/dashboard');},
-              // color: Colors.red,
-              // textColor: Colors.yellow,
-              padding: EdgeInsets.fromLTRB(10, 10, 10, 10),
-              // splashColor: Colors.grey,
-            ),
-
-            Text(
-               this._otherDisplay ?? "horst",
-              style: Theme.of(context).textTheme.display1,
-
-
-            ),
-            Column(
-              children: <Widget>[
-                Container(
-                  margin: EdgeInsets.only(left:15,right: 15),
-                  child:   RaisedButton(
-                    child:  Text("Kommunikation starten"),
-                    shape: new RoundedRectangleBorder(borderRadius: new BorderRadius.circular(10.0)),
-
-                  onPressed:  _connect ,
-                 // color: Colors.red,
-                 // textColor: Colors.yellow,
-                  padding: EdgeInsets.fromLTRB(10, 10, 10, 10),
-                 // splashColor: Colors.grey,
-                ),
-                ),
-                Text(
-                  this.network == 'wifi' ? '' : 'Der OBDII-Stecker ist nicht verbunden',
-
-                ),
-                Container(
-                  margin: EdgeInsets.only(left:15,right: 15),
-                  child:   RaisedButton(
-                    child:  Text("send custom"),
-                    shape: new RoundedRectangleBorder(borderRadius: new BorderRadius.circular(10.0)),
-
-                    onPressed: (btReady == true ) ? (){_sendOut(userInput.trim()+'\r');} : null,
+                    onPressed: () {
+                      Navigator.pushNamed(context, '/dashboard');
+                    },
                     // color: Colors.red,
                     // textColor: Colors.yellow,
                     padding: EdgeInsets.fromLTRB(10, 10, 10, 10),
                     // splashColor: Colors.grey,
                   ),
-                ),
-                Container(
-
-                  margin: EdgeInsets.only(left:15,right: 15),
-
-                child: TextFormField(
-                  
-                  textDirection: TextDirection.ltr,
-                  onFieldSubmitted: (res){userInput = res;},
-                  
-                  decoration: InputDecoration(
-                      border: OutlineInputBorder(),
-                      
+                  Text(
+                    this._otherDisplay ?? "horst",
+                    style: Theme.of(context).textTheme.display1,
                   ),
-                ),
-                ),
+                  Column(
+                    children: <Widget>[
+                      Container(
+                        margin: EdgeInsets.only(left: 15, right: 15),
+                        child: RaisedButton(
+                          child: Text("Kommunikation starten"),
+                          shape: new RoundedRectangleBorder(
+                              borderRadius: new BorderRadius.circular(10.0)),
 
+                          onPressed: _connect,
+                          // color: Colors.red,
+                          // textColor: Colors.yellow,
+                          padding: EdgeInsets.fromLTRB(10, 10, 10, 10),
+                          // splashColor: Colors.grey,
+                        ),
+                      ),
+                      Text(
+                        this.network == 'wifi'
+                            ? ''
+                            : 'Der OBDII-Stecker ist nicht verbunden',
+                      ),
+                      Container(
+                        margin: EdgeInsets.only(left: 15, right: 15),
+                        child: RaisedButton(
+                          child: Text("send custom"),
+                          shape: new RoundedRectangleBorder(
+                              borderRadius: new BorderRadius.circular(10.0)),
 
-              ],
-            )
+                          onPressed: (btReady == true && userInput != null)
+                              ? () {
+                                  _sendOut(userInput.trim() + '\r');
+                                }
+                              : null,
+                          // color: Colors.red,
+                          // textColor: Colors.yellow,
+                          padding: EdgeInsets.fromLTRB(10, 10, 10, 10),
+                          // splashColor: Colors.grey,
+                        ),
+                      ),
+                      Container(
+                        margin: EdgeInsets.only(left: 15, right: 15),
+                        child: TextFormField(
+                          textDirection: TextDirection.ltr,
+                          onFieldSubmitted: (res) {
+                            userInput = res;
+                          },
+                          decoration: InputDecoration(
+                            border: OutlineInputBorder(),
+                          ),
+                        ),
+                      ),
+                    ],
+                  )
+                ],
+              ),
+            ),
+          ),
 
-          ],
-        ),
-      ),
-      ),
-
-      floatingActionButton: FloatingActionButton(
-      //  onPressed: await  _getDisplay(),
-        onPressed: (){
-          Navigator.pushNamed( context, '/settings');
-        },
-        tooltip: 'Einstellungen',
-        child: Icon(Icons.settings),
-      ), // This trailing comma makes auto-formatting nicer for build methods.
-    ));
+          floatingActionButton: FloatingActionButton(
+            //  onPressed: await  _getDisplay(),
+            onPressed: () {
+              Navigator.pushNamed(context, '/settings');
+            },
+            tooltip: 'Einstellungen',
+            child: Icon(Icons.settings),
+          ), // This trailing comma makes auto-formatting nicer for build methods.
+        ));
   }
 }
