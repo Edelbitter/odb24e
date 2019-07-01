@@ -14,111 +14,97 @@ class SettingsPage extends StatefulWidget {
   SettingsState createState() => SettingsState();
 }
 
-
-class SettingsState extends State<SettingsPage>
-{
+class SettingsState extends State<SettingsPage> {
   @override
   Widget build(BuildContext context) {
-
     return Container(
-        decoration: BoxDecoration(
-          image: DecorationImage(
+      decoration: BoxDecoration(
+        image: DecorationImage(
           image: ExactAssetImage('images/gears.jpg'),
-          fit: BoxFit.cover,),),
-        child:
-      Scaffold(
+          fit: BoxFit.cover,
+        ),
+      ),
+      child: Scaffold(
         backgroundColor: Colors.transparent,
         appBar: AppBar(
-
           automaticallyImplyLeading: true,
           leading: IconButton(
-            icon:Icon(Icons.arrow_back),
-            onPressed:() => Navigator.pop(context),
+            icon: Icon(Icons.arrow_back),
+            onPressed: () => Navigator.pop(context),
           ),
           title: Text('Einstellungen'),
         ),
         body: Container(
-
-           // decoration: BoxDecoration(
-           // image: DecorationImage(
-           //   image: ExactAssetImage('images/gears.jpg'),
-           //   fit: BoxFit.cover,
+          // decoration: BoxDecoration(
+          // image: DecorationImage(
+          //   image: ExactAssetImage('images/gears.jpg'),
+          //   fit: BoxFit.cover,
 //
-        //    ),
-        //  ),
+          //    ),
+          //  ),
           child: Column(
             children: <Widget>[
-
               // Port
               Container(
-                margin: EdgeInsets.only(top:15,right: 15),
-                  child:
-                Row(
+                margin: EdgeInsets.only(top: 15, right: 15),
+                child: Row(
                   children: <Widget>[
-                  Center(child:
-                    Container(
-                      margin: EdgeInsets.only(left:15,right:20),
-                      padding: EdgeInsets.only(bottom: 15),
-                      child:
-                      Text('IP Adresse '),
-                  ),
-                ),
-                  new Expanded(
-                    child:
-                    TextFormField(
-                      initialValue: '192.168.0.10',
-                      textDirection: TextDirection.rtl,
-                      onFieldSubmitted: (res){URIIP = res;},
-                      maxLength: 15,
-                      decoration: InputDecoration(
-                        border: OutlineInputBorder(),
-                        helperText: 'Standard: 192.168.0.10'
+                    Center(
+                      child: Container(
+                        margin: EdgeInsets.only(left: 15, right: 20),
+                        padding: EdgeInsets.only(bottom: 15),
+                        child: Text('IP Adresse '),
                       ),
                     ),
-                  ),
+                    new Expanded(
+                      child: TextFormField(
+                        initialValue: '192.168.0.10',
+                        textDirection: TextDirection.rtl,
+                        onFieldSubmitted: (res) {
+                          URIIP = res;
+                        },
+                        maxLength: 15,
+                        decoration: InputDecoration(
+                            border: OutlineInputBorder(),
+                            helperText: 'Standard: 192.168.0.10'),
+                      ),
+                    ),
                   ],
                 ),
               ),
 
               // IP
               Container(
-                margin: EdgeInsets.only(top:15,right: 15),
-                child:
-                Row(
+                margin: EdgeInsets.only(top: 15, right: 15),
+                child: Row(
                   children: <Widget>[
-                    Center(child:
-                    Container(
-                      margin: EdgeInsets.only(left:15,right:20),
-                      padding: EdgeInsets.only(bottom: 15),
-                      child:
-                      Text('Port'),
-                    ),
+                    Center(
+                      child: Container(
+                        margin: EdgeInsets.only(left: 15, right: 20),
+                        padding: EdgeInsets.only(bottom: 15),
+                        child: Text('Port'),
+                      ),
                     ),
                     new Expanded(
-                      child:
-                      TextFormField(
+                      child: TextFormField(
                         initialValue: '35000',
                         textDirection: TextDirection.rtl,
-                        onFieldSubmitted: (res){PORT = int.parse(res);},
-
+                        onFieldSubmitted: (res) {
+                          PORT = int.parse(res);
+                        },
                         maxLength: 5,
                         decoration: InputDecoration(
-                          border: OutlineInputBorder(),
-                          helperText: 'Standard: 35000'
-                        ),
+                            border: OutlineInputBorder(),
+                            helperText: 'Standard: 35000'),
                       ),
                     ),
                   ],
                 ),
               ),
-
-          ],
-    ),
-    ),),
+            ],
+          ),
+        ),
+      ),
     );
-
-
   }
-
-
 }

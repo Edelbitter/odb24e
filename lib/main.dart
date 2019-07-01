@@ -8,6 +8,7 @@ import 'dart:convert';
 
 import 'settings.dart';
 import 'dashboard.dart';
+import 'dashboardLayout.dart';
 
 void main() => runApp(MyApp());
 
@@ -54,6 +55,8 @@ class MyApp extends StatelessWidget {
         '/': (context) => MyHomePage(title: 'zooom OBDII'),
         '/settings': (context) => SettingsPage(),
         '/dashboard': (context) => DashboardPage(),
+        '/dashboardLayout': (context) => DashboardLayoutPage(),
+        '/layoutDetails': (context) => DashboardDetailsPage(),
       },
       //  home: MyHomePage(title: 'zooom OBDII'),
     );
