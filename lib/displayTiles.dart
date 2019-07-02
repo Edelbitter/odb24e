@@ -81,13 +81,42 @@ class DisplayTileState extends State<DisplayTile> {
       onLongPress: () => {_displayDialog(context)},
       child: Container(
         margin: const EdgeInsets.all(2.0),
-        child: CustomRoundedBars.withSampleData(),
+        padding: EdgeInsets.all(3),
+        child: _getDisplay(),
         decoration: BoxDecoration(
             color: Colors.white,
             border: Border.all(
                 color: Colors.black, width: 2, style: BorderStyle.solid)),
       ),
     );
+  }
+
+  dynamic _getDisplay() {
+    if (typeValue == 'graph') {
+      return CustomRoundedBars.withSampleData();
+    } else if (typeValue == 'text') {
+      return FittedBox(
+          fit: BoxFit.fitWidth,
+          child: Container(
+              alignment: Alignment.bottomCenter,
+              child: Row(children: [
+                Text(
+                  '123',
+                  style: TextStyle(
+                      inherit: false, fontSize: 180, color: Colors.black87),
+                ),
+                Text('km/h',
+                    style: TextStyle(
+                        inherit: false, fontSize: 20, color: Colors.black))
+              ])));
+    } else {
+      return FittedBox(
+          fit: BoxFit.fitWidth,
+          child: Text(
+            'dial',
+            style: TextStyle(inherit: false, color: Colors.black87),
+          ));
+    }
   }
 }
 
