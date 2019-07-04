@@ -9,6 +9,7 @@ import 'dart:convert';
 import 'settings.dart';
 import 'dashboard.dart';
 import 'dashboardLayout.dart';
+import 'battery.dart';
 
 void main() => runApp(MyApp());
 
@@ -24,25 +25,10 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'zooommm',
       theme: ThemeData(
-        // This is the theme of your application.
-        //
-        // Try running your application with "flutter run". You'll see the
-        // application has a blue toolbar. Then, without quitting the app, try
-        // changing the primarySwatch below to Colors.green and then invoke
-        // "hot reload" (press "r" in the console where you ran "flutter run",
-        // or simply save your changes to "hot reload" in a Flutter IDE).
-        // Notice that the counter didn't reset back to zero; the application
-        // is not restarted.
-        // primarySwatch: Colors.black87,
         brightness: Brightness.dark,
         primaryColor: Colors.lightBlue[800],
         accentColor: Colors.cyan[600],
-
-        // Define the default font family.
         fontFamily: 'Montserrat',
-
-        // Define the default TextTheme. Use this to specify the default
-        // text styling for headlines, titles, bodies of text, and more.
         textTheme: TextTheme(
           headline: TextStyle(fontSize: 72.0, fontWeight: FontWeight.bold),
           title: TextStyle(fontSize: 36.0, fontStyle: FontStyle.italic),
@@ -57,6 +43,7 @@ class MyApp extends StatelessWidget {
         '/dashboard': (context) => DashboardPage(),
         '/dashboardLayout': (context) => DashboardLayoutPage(),
         '/layoutDetails': (context) => DashboardDetailsPage(),
+        '/battery': (context) => BatteryPage(),
       },
       //  home: MyHomePage(title: 'zooom OBDII'),
     );
@@ -66,17 +53,7 @@ class MyApp extends StatelessWidget {
 class MyHomePage extends StatefulWidget {
   MyHomePage({Key key, this.title}) : super(key: key);
 
-  // This widget is the home page of your application. It is stateful, meaning
-  // that it has a State object (defined below) that contains fields that affect
-  // how it looks.
-
-  // This class is the configuration for the state. It holds the values (in this
-  // case the title) provided by the parent (in this case the App widget) and
-  // used by the build method of the State. Fields in a Widget subclass are
-  // always marked "final".
-
   final String title;
-
   @override
   _MyHomePageState createState() => _MyHomePageState();
 }
@@ -137,9 +114,6 @@ class _MyHomePageState extends State<MyHomePage> {
       String rec = (new String.fromCharCodes(data));
       print(rec);
       String rec2 = ascii.decode(data);
-      // print('------------------');
-      //print(rec2);
-
       setState(() {
         if (rec.contains('>')) {
           ready = true;
@@ -269,13 +243,6 @@ class _MyHomePageState extends State<MyHomePage> {
     print('\n');
   }
 
-  void _send1() {
-    _sendOut('01 05\r');
-  }
-
-  void _send2() {
-    _sendOut('01 07\r');
-  }
 
   // setState(()
   // {
@@ -375,6 +342,15 @@ class _MyHomePageState extends State<MyHomePage> {
                     // textColor: Colors.yellow,
                     padding: EdgeInsets.fromLTRB(10, 10, 10, 10),
                     // splashColor: Colors.grey,
+                  ),
+                  RaisedButton(
+                    child: Text("Batteriedaten"),
+                    shape: new RoundedRectangleBorder(
+                        borderRadius: new BorderRadius.circular(10.0)),
+                    onPressed: () {
+                      Navigator.pushNamed(context, '/battery');
+                    },
+                    padding: EdgeInsets.fromLTRB(10, 10, 10, 10),
                   ),
                   Text(
                     this._otherDisplay ?? "horst",

@@ -10,15 +10,30 @@ import 'package:charts_flutter/flutter.dart' as charts;
 import 'displayTiles.dart';
 
 class DisplayTile extends StatefulWidget {
+  String initialType;
+  String graphType;
+
+  DisplayTile({String initType = 'text', String graphType = 'line'}) {
+    initialType = initType;
+    this.graphType = graphType;
+  }
+
   @override
-  DisplayTileState createState() => DisplayTileState();
+  DisplayTileState createState() => DisplayTileState(initialType, graphType);
 }
 
 class DisplayTileState extends State<DisplayTile> {
   @override
   initState() {}
 
-  String typeValue = 'graph';
+  String initialType;
+  String graphType;
+
+  DisplayTileState(this.initialType, this.graphType) {
+    typeValue = initialType;
+  }
+
+  String typeValue; // = 'graph';
   String dataValue = 'Speed';
 
   _displayDialog(BuildContext context) async {
@@ -78,7 +93,7 @@ class DisplayTileState extends State<DisplayTile> {
   @override
   Widget build(BuildContext context) {
     return InkWell(
-      onLongPress: () => {_displayDialog(context)},
+      // onLongPress: () => {_displayDialog(context)},
       child: Container(
         margin: const EdgeInsets.all(2.0),
         padding: EdgeInsets.all(3),
@@ -93,7 +108,11 @@ class DisplayTileState extends State<DisplayTile> {
 
   dynamic _getDisplay() {
     if (typeValue == 'graph') {
-      return CustomRoundedBars.withSampleData();
+      if (graphType == 'line') {
+        return SimpleTimeSeriesChart.withSampleData();
+      } else {
+        return CustomRoundedBars.withSampleData();
+      }
     } else if (typeValue == 'text') {
       return FittedBox(
           fit: BoxFit.fitWidth,
@@ -176,4 +195,62 @@ class OrdinalSales {
   final int sales;
 
   OrdinalSales(this.year, this.sales);
+}
+
+class SimpleTimeSeriesChart extends StatelessWidget {
+  final List<charts.Series> seriesList;
+  final bool animate;
+
+  SimpleTimeSeriesChart(this.seriesList, {this.animate});
+
+  /// Creates a [TimeSeriesChart] with sample data and no transition.
+  factory SimpleTimeSeriesChart.withSampleData() {
+    return new SimpleTimeSeriesChart(
+      _createSampleData(),
+      // Disable animations for image tests.
+      animate: false,
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return new charts.TimeSeriesChart(
+      seriesList,
+      animate: animate,
+      // Optionally pass in a [DateTimeFactory] used by the chart. The factory
+      // should create the same type of [DateTime] as the data provided. If none
+      // specified, the default creates local date time.
+      dateTimeFactory: const charts.LocalDateTimeFactory(),
+    );
+  }
+
+  /// Create one series with sample hard coded data.
+  static List<charts.Series<TimeSeriesSales, DateTime>> _createSampleData() {
+    final data = [
+      new TimeSeriesSales(new DateTime(2000, 9, 1,9,45), 5),
+      new TimeSeriesSales(new DateTime(2000, 9, 1,10,00), 5),
+      new TimeSeriesSales(new DateTime(2000, 9, 1,10,15), 5),
+      new TimeSeriesSales(new DateTime(2000, 9, 1,10,30), 25),
+      new TimeSeriesSales(new DateTime(2000, 9, 1,10,45), 15),
+      new TimeSeriesSales(new DateTime(2000, 9, 1,11,0), 10),
+    ];
+
+    return [
+      new charts.Series<TimeSeriesSales, DateTime>(
+        id: 'Sales',
+        colorFn: (_, __) => charts.MaterialPalette.blue.shadeDefault,
+        domainFn: (TimeSeriesSales sales, _) => sales.time,
+        measureFn: (TimeSeriesSales sales, _) => sales.sales,
+        data: data,
+      )
+    ];
+  }
+}
+
+/// Sample time series data type.
+class TimeSeriesSales {
+  final DateTime time;
+  final int sales;
+
+  TimeSeriesSales(this.time, this.sales);
 }
