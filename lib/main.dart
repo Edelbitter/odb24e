@@ -1,20 +1,25 @@
 import 'package:flutter/material.dart';
 import 'package:connectivity/connectivity.dart';
-import 'package:flutter_blue/flutter_blue.dart';
+//import 'package:flutter_blue/flutter_blue.dart';
 import 'package:flutter_bluetooth_serial/flutter_bluetooth_serial.dart';
 
 import 'dart:io';
 import 'dart:convert';
+import 'dart:math';
 
 import 'settings.dart';
 import 'dashboard.dart';
 import 'dashboardLayout.dart';
 import 'battery.dart';
+import 'database.dart';
 
 void main() => runApp(MyApp());
 
 String URIIP = '192.168.0.10';
 int PORT = 35000;
+FlutterBluetoothSerial bluetooth = FlutterBluetoothSerial.instance;
+BluetoothDevice theDevice;
+DataBase dataBase = new DataBase();
 
 //const String URI = "http://192.168.0.10:35000/";
 
@@ -75,8 +80,8 @@ class _MyHomePageState extends State<MyHomePage> {
   String gear = '';
 
   String userInput;
-  FlutterBlue bTooth = FlutterBlue.instance;
-  FlutterBluetoothSerial bluetooth = FlutterBluetoothSerial.instance;
+ // FlutterBlue bTooth = FlutterBlue.instance;
+
   var device;
   bool btReady = false;
   var btConnection;
@@ -113,7 +118,7 @@ class _MyHomePageState extends State<MyHomePage> {
     if (data != null) {
       String rec = (new String.fromCharCodes(data));
       print(rec);
-      String rec2 = ascii.decode(data);
+
       setState(() {
         if (rec.contains('>')) {
           ready = true;
@@ -123,6 +128,39 @@ class _MyHomePageState extends State<MyHomePage> {
         } else {
           _otherDisplay += rec;
         }
+
+        List<String> recBytes = rec.split(' ');
+
+        if(recBytes[2] == '62') {
+          switch (recBytes[3]) {
+            case '20':
+              {
+                switch(recBytes[3] )
+                {
+                  case '01':
+                    {
+                      dataBase.batteryTemperatures.add(new DoubleData(_convert1Hex(recBytes[4]).toDouble()-40, DateTime.now()));
+                    }
+                    break;
+                }
+              }
+              break;
+            case '22':
+              {
+
+              }
+              break;
+
+          }
+        }
+        else if(recBytes[2] == '61'){
+          switch (recBytes[3]) {
+            case '':
+          }
+        }
+        // ???
+        else if(recBytes[3] == '7F'){}
+
 //      if(rec.startsWith('41'))
 //        {
 //          if(rec.startsWith('5A',3))
@@ -151,19 +189,10 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   void _connect() {
-    bluetooth.getBondedDevices().then((dev) {
-      print('the devices');
-      for (var d in dev) {
-        print(d.name);
-        //if(d.name == 'UniCarScan')
-        if (d.name == 'UniCarScan') {
-          device = d;
-          setState(() {
-            _otherDisplay = "UniCar gefunden";
-            ready = true;
 
-            print('unicar gefunden');
-            print(d.connected);
+          setState(() {
+            ready = true;
+            print(theDevice.connected);
 
             bluetooth.onStateChanged().listen((state) {
               print('state changed');
@@ -172,9 +201,16 @@ class _MyHomePageState extends State<MyHomePage> {
             btReady = true;
             // Some simplest connection :F
             try {
-              BluetoothConnection.toAddress(d.address).then((connection) {
+              BluetoothConnection.toAddress(theDevice.address).then((connection) {
                 print('Connected to the device');
                 btConnection = connection;
+                _otherDisplay = 'connected';
+
+                _sendOut('atz');
+                _sendOut('atsp6');
+                _sendOut('ate0');
+                _sendOut('ath1');
+
 
                 connection.input.listen(dataHandler, onError: (err) {
                   print('cannot connect');
@@ -199,29 +235,64 @@ class _MyHomePageState extends State<MyHomePage> {
 
             //bluetooth.write(message)
           });
-        }
-      }
-    });
+
+      //}
+   // });
     //var scanSubscription = bTooth.state;
     //print(scanSubscription);
 
-    if (false) {
-      String uri = URIIP.length > 3 ? URIIP : '192.168.0.10';
-      int port = PORT == 0 ? 35000 : PORT;
-      Socket.connect(uri, port).then((socket) {
-        //socket.write('Hello, World!');
-        theSocket = socket;
-        theSocket.listen(dataHandler,
-            onError: errorHandler, onDone: doneHandler);
-        setState(() {
-          _otherDisplay = "connected";
-          ready = true;
-          print('connected');
-          _sendOut('AT E0\r');
-        });
-      });
+
+//      String uri = URIIP.length > 3 ? URIIP : '192.168.0.10';
+//      int port = PORT == 0 ? 35000 : PORT;
+//      Socket.connect(uri, port).then((socket) {
+//        //socket.write('Hello, World!');
+//        theSocket = socket;
+//        theSocket.listen(dataHandler,
+//            onError: errorHandler, onDone: doneHandler);
+//        setState(() {
+//          _otherDisplay = "connected";
+//          ready = true;
+//          print('connected');
+//          _sendOut('AT E0\r');
+//        });
+//      });
+
+  }
+
+  int _convert1Hex(String hex)
+  {
+    List<int> integers;
+    int result = 0;
+    for(int i = 0;i<hex.length; ++i)
+      {
+        result += (_convertHexDigit( hex.substring(hex.length - 1 - i,hex.length - 1 -i))) * pow(16,i);
+      }
+    return result;
+  }
+
+  int _convertHexDigit(String hex)
+  {
+    switch(hex){
+      case '0': return 0;
+      case '1': return 1;
+      case '2': return 2;
+      case '3': return 3;
+      case '4': return 4;
+      case '5': return 5;
+      case '6': return 6;
+      case '7': return 7;
+      case '8': return 8;
+      case '9': return 9;
+      case 'A': return 10;
+      case 'B': return 11;
+      case 'C': return 12;
+      case 'D': return 13;
+      case 'E': return 14;
+      case 'F': return 5;
     }
   }
+
+
 
 // Be sure to cancel subscription after you are done
   @override
@@ -283,12 +354,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   Widget build(BuildContext context) {
-    // This method is rerun every time setState is called, for instance as done
-    // by the _incrementCounter method above.
-    //
-    // The Flutter framework has been optimized to make rerunning build methods
-    // fast, so that you can just rebuild anything that needs updating rather
-    // than having to individually change instances of widgets.
+
     return Container(
         decoration: BoxDecoration(
           image: DecorationImage(
@@ -299,49 +365,28 @@ class _MyHomePageState extends State<MyHomePage> {
         child: Scaffold(
           backgroundColor: Colors.transparent,
           appBar: AppBar(
-            // Here we take the value from the MyHomePage object that was created by
-            // the App.build method, and use it to set our appbar title.
             title: Text(widget.title),
           ),
           body: Container(
-            //decoration: BoxDecoration(
-            // image: DecorationImage(
-            //    image: ExactAssetImage('images/motorCroppedDark.png'),
-            //   fit: BoxFit.fill,
-            // ),
-            // ),
+
             child: Center(
               // Center is a layout widget. It takes a single child and positions it
               // in the middle of the parent.
               child: Column(
-                // Column is also layout widget. It takes a list of children and
-                // arranges them vertically. By default, it sizes itself to fit its
-                // children horizontally, and tries to be as tall as its parent.
-                //
                 // Invoke "debug painting" (press "p" in the console, choose the
                 // "Toggle Debug Paint" action from the Flutter Inspector in Android
                 // Studio, or the "Toggle Debug Paint" command in Visual Studio Code)
                 // to see the wireframe for each widget.
-                //
-                // Column has various properties to control how it sizes itself and
-                // how it positions its children. Here we use mainAxisAlignment to
-                // center the children vertically; the main axis here is the vertical
-                // axis because Columns are vertical (the cross axis would be
-                // horizontal).
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: <Widget>[
                   RaisedButton(
                     child: Text("Dashboard"),
                     shape: new RoundedRectangleBorder(
                         borderRadius: new BorderRadius.circular(10.0)),
-
                     onPressed: () {
                       Navigator.pushNamed(context, '/dashboard');
                     },
-                    // color: Colors.red,
-                    // textColor: Colors.yellow,
                     padding: EdgeInsets.fromLTRB(10, 10, 10, 10),
-                    // splashColor: Colors.grey,
                   ),
                   RaisedButton(
                     child: Text("Batteriedaten"),
@@ -364,10 +409,7 @@ class _MyHomePageState extends State<MyHomePage> {
                           child: Text("Kommunikation starten"),
                           shape: new RoundedRectangleBorder(
                               borderRadius: new BorderRadius.circular(10.0)),
-
                           onPressed: _connect,
-                          // color: Colors.red,
-                          // textColor: Colors.yellow,
                           padding: EdgeInsets.fromLTRB(10, 10, 10, 10),
                           // splashColor: Colors.grey,
                         ),
