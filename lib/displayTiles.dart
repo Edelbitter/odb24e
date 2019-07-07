@@ -8,18 +8,19 @@ import 'main.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:charts_flutter/flutter.dart' as charts;
 import 'displayTiles.dart';
+import 'textTile.dart';
 
 class DisplayTile extends StatefulWidget {
   String initialType;
   String graphType;
 
-  DisplayTile({String initType = 'text', String graphType = 'line'}) {
-    initialType = initType;
-    this.graphType = graphType;
-  }
+//  DisplayTile({String initType = 'text', String graphType = 'line'}) {
+//    initialType = initType;
+//    this.graphType = graphType;
+//  }
 
   @override
-  DisplayTileState createState() => DisplayTileState(initialType, graphType);
+  DisplayTileState createState() => DisplayTileState();
 }
 
 class DisplayTileState extends State<DisplayTile> {
@@ -29,9 +30,9 @@ class DisplayTileState extends State<DisplayTile> {
   String initialType;
   String graphType;
 
-  DisplayTileState(this.initialType, this.graphType) {
-    typeValue = initialType;
-  }
+//  DisplayTileState(this.initialType, this.graphType) {
+//    typeValue = initialType;
+//  }
 
   String typeValue; // = 'graph';
   String dataValue = 'Speed';
@@ -90,6 +91,22 @@ class DisplayTileState extends State<DisplayTile> {
         });
   }
 
+  Widget buildOuter(Widget inner)
+  {
+    return InkWell(
+      // onLongPress: () => {_displayDialog(context)},
+      child: Container(
+        margin: const EdgeInsets.all(2.0),
+        padding: EdgeInsets.all(3),
+        child: inner,
+        decoration: BoxDecoration(
+            color: Colors.white,
+            border: Border.all(
+                color: Colors.black, width: 2, style: BorderStyle.solid)),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return InkWell(
@@ -120,7 +137,7 @@ class DisplayTileState extends State<DisplayTile> {
               alignment: Alignment.bottomCenter,
               child: Row(children: [
                 Text(
-                  '123',
+                  '456',
                   style: TextStyle(
                       inherit: false, fontSize: 180, color: Colors.black87),
                 ),

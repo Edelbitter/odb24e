@@ -72,19 +72,7 @@ class SettingsState extends State<SettingsPage> {
                         child: Text('IP Adresse '),
                       ),
                     ),
-                    new Expanded(
-                      child: TextFormField(
-                        initialValue: '192.168.0.10',
-                        textDirection: TextDirection.rtl,
-                        onFieldSubmitted: (res) {
-                          URIIP = res;
-                        },
-                        maxLength: 15,
-                        decoration: InputDecoration(
-                            border: OutlineInputBorder(),
-                            helperText: 'Standard: 192.168.0.10'),
-                      ),
-                    ),
+
                   ],
                 ),
               ),
@@ -101,19 +89,7 @@ class SettingsState extends State<SettingsPage> {
                         child: Text('Port'),
                       ),
                     ),
-                    new Expanded(
-                      child: TextFormField(
-                        initialValue: '35000',
-                        textDirection: TextDirection.rtl,
-                        onFieldSubmitted: (res) {
-                          PORT = int.parse(res);
-                        },
-                        maxLength: 5,
-                        decoration: InputDecoration(
-                            border: OutlineInputBorder(),
-                            helperText: 'Standard: 35000'),
-                      ),
-                    ),
+
                   ],
                 ),
               ),

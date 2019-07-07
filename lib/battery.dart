@@ -8,6 +8,8 @@ import 'main.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:charts_flutter/flutter.dart' as charts;
 import 'displayTiles.dart';
+import 'textTile.dart';
+import 'lineChartTile.dart';
 
 class BatteryPage extends StatefulWidget {
   @override
@@ -31,7 +33,7 @@ class BatteryState extends State<BatteryPage> {
             icon: Icon(Icons.arrow_back),
             onPressed: () => {Navigator.pop(context)},
           ),
-          title: Text('DashboardDetails'),
+          title: Text('Battery Data'),
         ),
         body: Container(
           constraints: BoxConstraints.tight(MediaQuery.of(context).size),
@@ -41,31 +43,41 @@ class BatteryState extends State<BatteryPage> {
             physics: new NeverScrollableScrollPhysics(),
 
             primary: true,
-            crossAxisCount: 3,
+            crossAxisCount: 12,
             // mainAxisSpacing: 2.0,
             // crossAxisSpacing: 2.0,
             children: <Widget>[
-              DisplayTile(initType: 'graph'),
-              DisplayTile(),
+              Center(child:Text("Battery Temperature")),
+              LineChartTile(data:dataBase.batteryTemperatures),
+              TextTile(data:dataBase.batteryTemperatures.last.data.toString(),unit:'°C'),
 
-              DisplayTile(initType: 'graph'),
-              DisplayTile(),
+              Center(child:Text("State of Charge")),
+              LineChartTile(data:dataBase.soC),
+              TextTile(data:dataBase.soC.last.data.toString(),unit: '%'),
 
-              DisplayTile(initType: 'graph'),
+              Center(child:Text("Battery Temperature")),
               DisplayTile(),
+              TextTile(data:'123'),
 
-              DisplayTile(initType: 'graph'),
+              Center(child:Text("Battery Temperature")),
               DisplayTile(),
+              TextTile(data:'456'),
             ],
             staggeredTiles: const <StaggeredTile>[
-              const StaggeredTile.count(2, 1),
-              const StaggeredTile.count(1, 1),
-              const StaggeredTile.count(2, 1),
-              const StaggeredTile.count(1, 1),
-              const StaggeredTile.count(2, 1),
-              const StaggeredTile.count(1, 1),
-              const StaggeredTile.count(2, 1),
-              const StaggeredTile.count(1, 1),
+              const StaggeredTile.count(12, 1),
+              const StaggeredTile.count(8, 3),
+              const StaggeredTile.count(4, 3),
+              const StaggeredTile.count(12, 1),
+              const StaggeredTile.count(8, 3),
+              const StaggeredTile.count(4, 3),
+              const StaggeredTile.count(12, 1),
+              const StaggeredTile.count(8, 3),
+              const StaggeredTile.count(4, 3),
+              const StaggeredTile.count(12, 1),
+              const StaggeredTile.count(8, 3),
+              const StaggeredTile.count(4, 3),
+
+
             ],
           ),
         ));
