@@ -5,6 +5,11 @@ class DataBase
   List<DoubleData> batteryTemperatures;
   List<DoubleData> soC;
 
+  List<DoubleData> consumAirCon;
+  List<DoubleData> consumDrive;
+  List<DoubleData> consumHeat;
+  List<DoubleData> consum12V;
+
   DataBase(){}
 
   factory DataBase.withFakeData(){
@@ -27,6 +32,22 @@ class DataBase
     db.soC.add(new DoubleData(90, new DateTime(2019,1,1,0,0,0)));
     db.soC.add(new DoubleData(70, new DateTime(2019,1,1,1,0,0)));
     db.soC.add(new DoubleData(40, new DateTime(2019,1,1,2,0,0)));
+    db.consum12V = new List<DoubleData>();
+    db.consumAirCon = new List<DoubleData>();
+    db.consumHeat = new List<DoubleData>();
+    db.consumDrive = new List<DoubleData>();
+    db.consum12V.add(new DoubleData(40, new DateTime(2019,1,1,0,0,0)));
+    db.consum12V.add(new DoubleData(70, new DateTime(2019,1,1,1,0,0)));
+    db.consum12V.add(new DoubleData(40, new DateTime(2019,1,1,2,0,0)));
+    db.consumAirCon.add(new DoubleData(110, new DateTime(2019,1,1,0,0,0)));
+    db.consumAirCon.add(new DoubleData(70, new DateTime(2019,1,1,1,0,0)));
+    db.consumAirCon.add(new DoubleData(40, new DateTime(2019,1,1,2,0,0)));
+    db.consumHeat.add(new DoubleData(20, new DateTime(2019,1,1,0,0,0)));
+    db.consumHeat.add(new DoubleData(70, new DateTime(2019,1,1,1,0,0)));
+    db.consumHeat.add(new DoubleData(40, new DateTime(2019,1,1,2,0,0)));
+    db.consumDrive.add(new DoubleData(300, new DateTime(2019,1,1,0,0,0)));
+    db.consumDrive.add(new DoubleData(70, new DateTime(2019,1,1,1,0,0)));
+    db.consumDrive.add(new DoubleData(40, new DateTime(2019,1,1,2,0,0)));
     return db;
   }
 }

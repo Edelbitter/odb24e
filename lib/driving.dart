@@ -11,12 +11,12 @@ import 'displayTiles.dart';
 import 'textTile.dart';
 import 'lineChartTile.dart';
 
-class BatteryPage extends StatefulWidget {
+class DrivingPage extends StatefulWidget {
   @override
-  BatteryState createState() => BatteryState();
+  DrivingState createState() => DrivingState();
 }
 
-class BatteryState extends State<BatteryPage> {
+class DrivingState extends State<DrivingPage> {
   @override
   initState() {}
 
@@ -33,7 +33,7 @@ class BatteryState extends State<BatteryPage> {
             icon: Icon(Icons.arrow_back),
             onPressed: () => {Navigator.pop(context)},
           ),
-          title: Text('Battery Data'),
+          title: Text('Driving Data'),
         ),
         body: Container(
           constraints: BoxConstraints.tight(MediaQuery.of(context).size),
@@ -47,21 +47,21 @@ class BatteryState extends State<BatteryPage> {
             // mainAxisSpacing: 2.0,
             // crossAxisSpacing: 2.0,
             children: <Widget>[
-              Center(child:Text("Battery Temperature")),
+              Center(child:Text("Power Consumption")),
               LineChartTile(data:dataBase.batteryTemperatures),
-              TextTile(data:dataBase.batteryTemperatures.last.data.toString(),unit:'°C'),
+              TextTile(data:dataBase.batteryTemperatures.last.data.toString(),unit:'kW'),
 
-              Center(child:Text("State of Charge")),
+              Center(child:Text("Remaining Range")),
               LineChartTile(data:dataBase.soC),
-              TextTile(data:dataBase.soC.last.data.toString(),unit: '%'),
+              TextTile(data:dataBase.soC.last.data.toString(),unit: 'km'),
 
-              Center(child:Text("Battery Health")),
-              Center(child:Text("Battery Voltage")),
-              Center(child:Text("Battery Current")),
+              Center(child:Text("Speed")),
+              Center(child:Text("Torque")),
+              Center(child:Text("Recuperation")),
 
-              TextTile(data:'90',unit:'%'),
-              TextTile(data:'399',unit:'V'),
-              TextTile(data:'123',unit:'A'),
+              TextTile(data:'50',unit:'km/h'),
+              TextTile(data:'400',unit:'Nm'),
+              TextTile(data:'1',unit:'A'),
 
 
             ],

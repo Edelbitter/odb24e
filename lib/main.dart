@@ -13,6 +13,8 @@ import 'dashboardLayout.dart';
 import 'battery.dart';
 import 'database.dart';
 import 'connectionAndParsingHelpers.dart';
+import 'driving.dart';
+import 'consumption.dart';
 
 void main() => runApp(MyApp());
 
@@ -51,6 +53,8 @@ class MyApp extends StatelessWidget {
         '/dashboardLayout': (context) => DashboardLayoutPage(),
         '/layoutDetails': (context) => DashboardDetailsPage(),
         '/battery': (context) => BatteryPage(),
+        '/drive': (context) => DrivingPage(),
+        '/consum': (context) => ConsumptionPage(),
       },
     );
   }
@@ -127,11 +131,29 @@ class _MyHomePageState extends State<MyHomePage> {
                     padding: EdgeInsets.fromLTRB(10, 10, 10, 10),
                   ),
                   RaisedButton(
-                    child: Text("Batteriedaten"),
+                    child: Text("Battery Data"),
                     shape: new RoundedRectangleBorder(
                         borderRadius: new BorderRadius.circular(10.0)),
                     onPressed: () {
                       Navigator.pushNamed(context, '/battery');
+                    },
+                    padding: EdgeInsets.fromLTRB(10, 10, 10, 10),
+                  ),
+                  RaisedButton(
+                    child: Text("Driving Data"),
+                    shape: new RoundedRectangleBorder(
+                        borderRadius: new BorderRadius.circular(10.0)),
+                    onPressed: () {
+                      Navigator.pushNamed(context, '/drive');
+                    },
+                    padding: EdgeInsets.fromLTRB(10, 10, 10, 10),
+                  ),
+                  RaisedButton(
+                    child: Text("Consumption"),
+                    shape: new RoundedRectangleBorder(
+                        borderRadius: new BorderRadius.circular(10.0)),
+                    onPressed: () {
+                      Navigator.pushNamed(context, '/consum');
                     },
                     padding: EdgeInsets.fromLTRB(10, 10, 10, 10),
                   ),
@@ -144,7 +166,7 @@ class _MyHomePageState extends State<MyHomePage> {
                       Container(
                         margin: EdgeInsets.only(left: 15, right: 15),
                         child: RaisedButton(
-                          child: Text("Kommunikation starten"),
+                          child: Text("Start Communication"),
                           shape: new RoundedRectangleBorder(
                               borderRadius: new BorderRadius.circular(10.0)),
                           onPressed: _connect,

@@ -10,13 +10,14 @@ import 'package:charts_flutter/flutter.dart' as charts;
 import 'displayTiles.dart';
 import 'textTile.dart';
 import 'lineChartTile.dart';
+import 'pieChartTile.dart';
 
-class BatteryPage extends StatefulWidget {
+class ConsumptionPage extends StatefulWidget {
   @override
-  BatteryState createState() => BatteryState();
+  ConsumptionState createState() => ConsumptionState();
 }
 
-class BatteryState extends State<BatteryPage> {
+class ConsumptionState extends State<ConsumptionPage> {
   @override
   initState() {}
 
@@ -33,7 +34,7 @@ class BatteryState extends State<BatteryPage> {
             icon: Icon(Icons.arrow_back),
             onPressed: () => {Navigator.pop(context)},
           ),
-          title: Text('Battery Data'),
+          title: Text('Consumption Data'),
         ),
         body: Container(
           constraints: BoxConstraints.tight(MediaQuery.of(context).size),
@@ -47,21 +48,21 @@ class BatteryState extends State<BatteryPage> {
             // mainAxisSpacing: 2.0,
             // crossAxisSpacing: 2.0,
             children: <Widget>[
-              Center(child:Text("Battery Temperature")),
+              Center(child:Text("Current Power Consumption")),
               LineChartTile(data:dataBase.batteryTemperatures),
-              TextTile(data:dataBase.batteryTemperatures.last.data.toString(),unit:'°C'),
+              TextTile(data:dataBase.batteryTemperatures.last.data.toString(),unit:'kW'),
 
-              Center(child:Text("State of Charge")),
-              LineChartTile(data:dataBase.soC),
-              TextTile(data:dataBase.soC.last.data.toString(),unit: '%'),
+              Center(child:Text("Distribution")),
+              PieChartTile(data: [dataBase.consum12V,dataBase.consumAirCon,dataBase.consumHeat, dataBase.consumDrive ]),
 
-              Center(child:Text("Battery Health")),
-              Center(child:Text("Battery Voltage")),
-              Center(child:Text("Battery Current")),
 
-              TextTile(data:'90',unit:'%'),
-              TextTile(data:'399',unit:'V'),
-              TextTile(data:'123',unit:'A'),
+//              Center(child:Text("Battery Health")),
+//              Center(child:Text("Battery Voltage")),
+//              Center(child:Text("Battery Current")),
+//
+//              TextTile(data:'90',unit:'%'),
+//              TextTile(data:'399',unit:'V'),
+//              TextTile(data:'123',unit:'A'),
 
 
             ],
@@ -70,14 +71,7 @@ class BatteryState extends State<BatteryPage> {
               const StaggeredTile.count(8, 3),
               const StaggeredTile.count(4, 3),
               const StaggeredTile.count(12, 1),
-              const StaggeredTile.count(8, 3),
-              const StaggeredTile.count(4, 3),
-              const StaggeredTile.count(4, 1),
-              const StaggeredTile.count(4, 1),
-              const StaggeredTile.count(4, 1),
-              const StaggeredTile.count(4, 3),
-              const StaggeredTile.count(4, 3),
-              const StaggeredTile.count(4, 3),
+              const StaggeredTile.count(12, 12),
 
 
 
