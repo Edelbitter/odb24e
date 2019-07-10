@@ -24,6 +24,7 @@ FlutterBluetoothSerial bluetooth = FlutterBluetoothSerial.instance;
 var btConnection;
 BluetoothDevice theDevice;
 DataBase dataBase = new DataBase.withFakeData();
+String otherDisplay;
 
 ////////////////////////////////////
 
@@ -69,13 +70,15 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  String _otherDisplay = "^_^";
+
 
   String userInput;
 
   @override
   initState() {
     super.initState();
+   // initBt();
+    otherDisplay = theDevice == null ? 'no Bluetooth device selected': "^_^";
   }
 
   void errorHandler(error, StackTrace trace) {
@@ -121,6 +124,18 @@ class _MyHomePageState extends State<MyHomePage> {
                 // to see the wireframe for each widget.
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: <Widget>[
+                  Container(
+                    margin: EdgeInsets.only(left: 15, right: 15),
+                    child: TextFormField(
+                      textDirection: TextDirection.ltr,
+                      onFieldSubmitted: (res) {
+                        userInput = res;
+                      },
+                      decoration: InputDecoration(
+                        border: OutlineInputBorder(),
+                      ),
+                    ),
+                  ),
                   RaisedButton(
                     child: Text("Dashboard"),
                     shape: new RoundedRectangleBorder(
@@ -158,7 +173,7 @@ class _MyHomePageState extends State<MyHomePage> {
                     padding: EdgeInsets.fromLTRB(10, 10, 10, 10),
                   ),
                   Text(
-                    this._otherDisplay ?? "horst",
+                    otherDisplay ?? "horst",
                     style: Theme.of(context).textTheme.display1,
                   ),
                   Column(
@@ -192,18 +207,7 @@ class _MyHomePageState extends State<MyHomePage> {
                           // splashColor: Colors.grey,
                         ),
                       ),
-                      Container(
-                        margin: EdgeInsets.only(left: 15, right: 15),
-                        child: TextFormField(
-                          textDirection: TextDirection.ltr,
-                          onFieldSubmitted: (res) {
-                            userInput = res;
-                          },
-                          decoration: InputDecoration(
-                            border: OutlineInputBorder(),
-                          ),
-                        ),
-                      ),
+
                     ],
                   )
                 ],

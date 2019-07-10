@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:connectivity/connectivity.dart';
 import 'package:flutter_bluetooth_serial/flutter_bluetooth_serial.dart';
-
+import 'package:shared_preferences/shared_preferences.dart';
 
 import 'dart:io';
 import 'dart:convert';
@@ -19,14 +19,30 @@ class SettingsPage extends StatefulWidget {
 class SettingsState extends State<SettingsPage> {
 
   List<BluetoothDevice> bondedDevices = [];
+  SharedPreferences prefs;
 
 
   @override
   initState() {
+  initBT();
+
+
+  }
+
+  initBT()
+  {
     bluetooth.getBondedDevices().then((dev) {
       setState(() {
         bondedDevices = dev;
-
+      });
+      SharedPreferences.getInstance().then((pre) {
+        prefs = pre;
+        var savedDev = prefs.getString('btDevice');
+        if(savedDev != null)
+        {
+          theDevice = bondedDevices.firstWhere((b)=>b.name == savedDev,orElse: ()=> null);
+          print(theDevice.name);
+        }
       });
     });
   }
@@ -63,14 +79,33 @@ class SettingsState extends State<SettingsPage> {
               // Port
               Container(
                 margin: EdgeInsets.only(top: 15, right: 15),
+                decoration: new BoxDecoration(border: Border.all(color: Colors.white)),
                 child: Row(
                   children: <Widget>[
                     Center(
                       child: Container(
-                        margin: EdgeInsets.only(left: 15, right: 20),
+                        margin: EdgeInsets.only(left: 15, right: 20,top:15),
                         padding: EdgeInsets.only(bottom: 15),
-                        child: Text('IP Adresse '),
+                        child: Text('Bluetooth Device:'),
                       ),
+                    ),
+                    DropdownButton<BluetoothDevice>(
+                      value: theDevice ,
+                      hint: Text('select a device'),
+                      onChanged: (BluetoothDevice newValue) {
+                        setState(() {
+                          theDevice = newValue;
+                          otherDisplay = '^_^';
+                          prefs.setString('btDevice',theDevice.name);
+                        });
+                      },
+                      items: bondedDevices
+                          .map<DropdownMenuItem<BluetoothDevice>>((BluetoothDevice value) {
+                        return DropdownMenuItem<BluetoothDevice>(
+                          value: value,
+                          child: Text(value.name),
+                        );
+                      }).toList(),
                     ),
 
                   ],
@@ -78,36 +113,8 @@ class SettingsState extends State<SettingsPage> {
               ),
 
               // IP
-              Container(
-                margin: EdgeInsets.only(top: 15, right: 15),
-                child: Row(
-                  children: <Widget>[
-                    Center(
-                      child: Container(
-                        margin: EdgeInsets.only(left: 15, right: 20),
-                        padding: EdgeInsets.only(bottom: 15),
-                        child: Text('Port'),
-                      ),
-                    ),
 
-                  ],
-                ),
-              ),
-              DropdownButton<BluetoothDevice>(
-                value: theDevice,
-                onChanged: (BluetoothDevice newValue) {
-                  setState(() {
-                    theDevice = newValue;
-                  });
-                },
-                items: bondedDevices
-                    .map<DropdownMenuItem<BluetoothDevice>>((BluetoothDevice value) {
-                  return DropdownMenuItem<BluetoothDevice>(
-                    value: value,
-                    child: Text(value.name),
-                  );
-                }).toList(),
-              ),
+
             ],
           ),
         ),
