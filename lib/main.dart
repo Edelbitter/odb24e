@@ -172,10 +172,7 @@ class _MyHomePageState extends State<MyHomePage> {
                     },
                     padding: EdgeInsets.fromLTRB(10, 10, 10, 10),
                   ),
-                  Text(
-                    otherDisplay ?? "horst",
-                    style: Theme.of(context).textTheme.display1,
-                  ),
+
                   Column(
                     children: <Widget>[
                       Container(
@@ -198,7 +195,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
                           onPressed: (userInput != null)
                               ? () {
-                                  CapHelp.sendOut(userInput.trim() + '\r');
+                                  CapHelp.sendOut(userInput.trim() );
                                 }
                               : null,
                           // color: Colors.red,
@@ -207,7 +204,10 @@ class _MyHomePageState extends State<MyHomePage> {
                           // splashColor: Colors.grey,
                         ),
                       ),
-
+                      Text(
+                        otherDisplay ?? "horst",
+                        style: Theme.of(context).textTheme.display1,
+                      ),
                     ],
                   )
                 ],

@@ -3,11 +3,13 @@ import 'package:flutter_bluetooth_serial/flutter_bluetooth_serial.dart';
 import 'dart:io';
 import 'dart:convert';
 import 'dart:math';
+import 'dart:async';
 
 import 'main.dart';
 import 'database.dart';
 
 class CapHelp {
+  static int initcount = 0;
   static void connect() {
     print(theDevice.connected);
 
@@ -20,12 +22,21 @@ class CapHelp {
       BluetoothConnection.toAddress(theDevice.address).then((connection) {
         print('Connected to the device');
         btConnection = connection;
-
-        // initialize ELM327
-        sendOut('atz');
-        sendOut('atsp6');
-        sendOut('ate0');
-        sendOut('ath1');
+        initcount = 1;
+        var dur = new Duration(milliseconds: 800);
+        var tt = new Timer(dur, () {
+          print('timer start');
+          sendOut('atz');
+          new Timer(dur, () {
+            sendOut('atsp6');
+            new Timer(dur, () {
+              sendOut('ate0');
+              new Timer(dur, () {
+                sendOut('ath1');
+              });
+            });
+          });
+        });
 
         connection.input.listen(dataHandler, onError: (err) {
           print('cannot connect');
@@ -33,6 +44,7 @@ class CapHelp {
         }).onDone(() {
           print('Disconnected by remote request');
         });
+        // sendOut('atz');
       });
     } catch (exception) {
       print('Cannot connect, exception occured');
@@ -41,66 +53,84 @@ class CapHelp {
 
   static void sendOut(String toSend) {
     //ready = false;
-    List<int> bytes = utf8.encode(toSend);
+    List<int> bytes = utf8.encode(toSend.trim() + '\r');
     // theSocket.add(bytes);
     btConnection.output.add(bytes);
     //bluetooth.writeBytes(bytes);
-    print(toSend);
-    print('\n');
+    //  print(toSend);
+    // print('\n');
   }
 
   static void dataHandler(data) {
     // print(data);
     if (data != null) {
       String rec = (new String.fromCharCodes(data));
-      print(rec);
+      // print('received:');
+      //  print(rec);
 
       // setState(() {
-      if (rec.contains('>')) {
-        //  ready = true;
-      }
-//        if (_otherDisplay.contains(">")) {
-//          _otherDisplay = "received \n" + rec;
-//        } else {
-//          _otherDisplay += rec;
+      // if (rec.contains('>')) {
+      //  ready = true;
+//        switch(initcount)
+//        {
+//          case 1:{ sendOut('atstff'); print('initializing'); ++initcount; break;}
+//          case 2:{ sendOut('atsp6'); ++initcount;break;}
+//          case 3:{ sendOut('ath1'); ++initcount; break;}
+//          case 4: {sendOut('ate0'); ++initcount; break;}
+//          default: initcount=0;
 //        }
+      // }
+      // setState((){});
+      if (!otherDisplay.contains(">")) {
+        otherDisplay += rec;
+      } else {
+        print(otherDisplay);
 
-      List<String> recBytes = rec.split(' ');
+        List<String> recBytes = otherDisplay.trim().split(' ');
+        print('split');
+        print(recBytes);
 
-      if (recBytes[2] == '62') {
-        switch (recBytes[3]) {
-          case '20':
-            {
-              switch (recBytes[3]) {
-                case '01':
-                  {
-                    dataBase.batteryTemperatures.add(new DoubleData(
-                        _convert1Hex(recBytes[4]).toDouble() - 40,
-                        DateTime.now()));
-                  }
-                  break;
+        if (recBytes.length > 5 && recBytes[1] == '7EC')
+        if(recBytes[2]=='62')
+        {
+          switch (recBytes[3]) {
+            case '20':
+              {
+                switch (recBytes[4]) {
+                  case '01':
+                    {
+                      print('found batt');
+                      dataBase.batteryTemperatures.add(new DoubleData(
+                          _convert1Hex(recBytes[5]).toDouble() - 40,
+                          DateTime.now()));
+                    }
+                    break;
+                }
               }
-            }
-            break;
-          case '22':
-            {}
-            break;
-        }
-      } else if (recBytes[2] == '61') {
-        switch (recBytes[3]) {
-          case '':
-        }
-      } else if (recBytes[3] == '7F') {} //
-      //  });
+              break;
+            case '22':
+              {}
+              break;
+          }
+        } else if (recBytes[2] == '61') {
+          switch (recBytes[3]) {
+            case '':
+          }
+        } else if (recBytes[3] == '7F') {} //
+        //  });
+        print(dataBase.batteryTemperatures);
+        otherDisplay = rec;
+      }
     }
   }
 
   static int _convert1Hex(String hex) {
+    print(hex.length);
     List<int> integers;
     int result = 0;
     for (int i = 0; i < hex.length; ++i) {
       result += (_convertHexDigit(
-              hex.substring(hex.length - 1 - i, hex.length - 1 - i))) *
+              hex.substring(hex.length - 1 - i, hex.length  - i))) *
           pow(16, i);
     }
     return result;
