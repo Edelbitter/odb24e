@@ -92,17 +92,24 @@ class CapHelp {
     //  print(toSend);
     // print('\n');
   }
-
+int i = 0;
+  var dur = new Duration(milliseconds: 300);
   void startRequests() {
-    var dur = new Duration(milliseconds: 300);
-    for (int i = 0; i < allRequests.length; ++i) {
+
+
+
       if (ready) {
         ready = false;
-        new Timer(dur, () => sendOut(allRequests[i][7]));
-      } else {
-        --i;
+        new Timer(dur, ()  {
+          sendOut(allRequests[i++][7]);
+          if(i>=allRequests.length)
+            {
+              i = 0;
+            }
+          startRequests();
+        });
       }
-    }
+
   }
 
   void dataHandler(data) {

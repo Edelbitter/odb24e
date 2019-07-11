@@ -51,7 +51,7 @@ class LineChartState extends State<LineChartTile>
       colorFn: (_, __) => charts.MaterialPalette.blue.shadeDefault,
       domainFn: (DoubleData dat, _) => dat.time,
       measureFn: (DoubleData dat, _) => dat.data,
-      data: data,
+      data: data.toList(),
     )]));
   }
 }

@@ -4,28 +4,30 @@ import 'package:obd24e/pieChartTile.dart';
 
 class DataBase extends ChangeNotifier {
 
-Map<String,List<DoubleData>> rawData ={
+  int bufferSize = 10;
+
+Map<String,Queue<DoubleData>> rawData ={
   // battery temperature
-'622001':  new List<DoubleData>(),
+'622001':  new Queue<DoubleData>(),
   // SoC
-'622002':new List<DoubleData>(),
-'622003':new List<DoubleData>(),
-'622006':new List<DoubleData>(),
-'62200E':new List<DoubleData>(),
-'622051':new List<DoubleData>(),
-'623307':new List<DoubleData>(),
-'6234CF':new List<DoubleData>(),
-'623478':new List<DoubleData>(),
-'623459':new List<DoubleData>(),
-'623457':new List<DoubleData>(),
-'623456':new List<DoubleData>(),
-'623455':new List<DoubleData>(),
-'623454':new List<DoubleData>(),
-'623454':new List<DoubleData>(),
-'623451':new List<DoubleData>(),
-'623458':new List<DoubleData>(),
-'6233A7':new List<DoubleData>(),
-'623414':new List<DoubleData>(),
+'622002':new Queue<DoubleData>(),
+'622003':new Queue<DoubleData>(),
+'622006':new Queue<DoubleData>(),
+'62200E':new Queue<DoubleData>(),
+'622051':new Queue<DoubleData>(),
+'623307':new Queue<DoubleData>(),
+'6234CF':new Queue<DoubleData>(),
+'623478':new Queue<DoubleData>(),
+'623459':new Queue<DoubleData>(),
+'623457':new Queue<DoubleData>(),
+'623456':new Queue<DoubleData>(),
+'623455':new Queue<DoubleData>(),
+'623454':new Queue<DoubleData>(),
+'623454':new Queue<DoubleData>(),
+'623451':new Queue<DoubleData>(),
+'623458':new Queue<DoubleData>(),
+'6233A7':new Queue<DoubleData>(),
+'623414':new Queue<DoubleData>(),
 };
   List<DoubleData> batteryTemperatures = new List<DoubleData>();
   List<DoubleData> soC = new List<DoubleData>();
@@ -54,6 +56,8 @@ Map<String,List<DoubleData>> rawData ={
   {
 
     rawData[ident].add(data);
+    if(rawData[ident].length>bufferSize)
+      rawData[ident].removeFirst();
     //print(rawData[ident].map((ff) => ff.data));
     notifyListeners();
   }

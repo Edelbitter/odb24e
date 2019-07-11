@@ -7,6 +7,7 @@ import 'package:provider/provider.dart';
 import 'dart:io';
 import 'dart:convert';
 import 'dart:math';
+import 'dart:async';
 
 import 'settings.dart';
 import 'dashboard.dart';
@@ -97,6 +98,14 @@ class _MyHomePageState extends State<MyHomePage> {
           otherDisplay = 'connected';
         });
       });
+  }
+
+  void send()
+  {
+
+
+        new Timer(new Duration(milliseconds: 500),(){ capHelp.sendTestData('7EC03622001'+ rand.nextInt(10).toString()+ rand.nextInt(10).toString()+'>');send();});
+
   }
 
 //  void dataHandler(data) {
@@ -219,9 +228,7 @@ class _MyHomePageState extends State<MyHomePage> {
                           shape: new RoundedRectangleBorder(
                               borderRadius: new BorderRadius.circular(10.0)),
 
-                          onPressed:  () {
-                            capHelp.sendTestData('7EC03622001'+ rand.nextInt(10).toString()+ rand.nextInt(10).toString()+'>');
-                          }
+                          onPressed: send
                              ,
                           // color: Colors.red,
                           // textColor: Colors.yellow,
