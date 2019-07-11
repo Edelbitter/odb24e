@@ -9,27 +9,37 @@ import 'main.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:charts_flutter/flutter.dart' as charts;
 import 'displayTiles.dart';
+import 'package:provider/provider.dart';
+import 'database.dart';
+import 'allRequests.dart';
+
 
 class TextTile extends StatefulWidget {
 
-  String unit;
-  String data;
-  TextTile({this.data,this.unit}){}
+  String ident;
+
+  TextTile(this.ident){}
   @override
-  TextTileState createState() => TextTileState(data:data,unit:unit);
+  TextTileState createState() => TextTileState(ident);
 }
 
 class TextTileState extends State<TextTile>
 {
-  TextTileState({this.data,this.unit}){}
+  TextTileState(this.ident){}
   var dtState = new DisplayTileState();
+  String ident;// = 'AAA';
+  String data = 'tescht';
   String unit;
-  String data;
 
 
   @override
   Widget build(BuildContext context)
   {
+    var dataBase = Provider.of<DataBase>(context);
+
+    if(dataBase.rawData[ident].length>0)
+    data = dataBase.rawData[ident].last.data.toString();
+    unit = allRequests[ident][6];
     return dtState.buildOuter(getDisplay());
   }
 
@@ -37,7 +47,7 @@ class TextTileState extends State<TextTile>
   dynamic getDisplay()
   {
     var row = [Text(
-      data,
+      data ?? 'null',
       style: TextStyle(
           inherit: false, fontSize: 180, color: Colors.black87),
     )];
@@ -49,10 +59,11 @@ class TextTileState extends State<TextTile>
       }
 
 
-    return FittedBox(
+    return Consumer<DataBase>(builder: (context,dataBase,child)=>
+      FittedBox(
         fit: BoxFit.fitWidth,
         child: Container(
             alignment: Alignment.bottomCenter,
-            child: Row(children: row)));
+            child: Row(children: row))));
   }
 }

@@ -1,4 +1,5 @@
 import 'package:flutter_bluetooth_serial/flutter_bluetooth_serial.dart';
+import 'package:provider/provider.dart';
 
 import 'dart:io';
 import 'dart:convert';
@@ -7,10 +8,36 @@ import 'dart:async';
 
 import 'main.dart';
 import 'database.dart';
+import 'allRequests.dart';
+import 'package:flutter/material.dart';
+import 'package:connectivity/connectivity.dart';
+//import 'package:flutter_blue/flutter_blue.dart';
+import 'package:flutter_bluetooth_serial/flutter_bluetooth_serial.dart';
+import 'package:provider/provider.dart';
+
+import 'dart:io';
+import 'dart:convert';
+import 'dart:math';
+
+import 'settings.dart';
+import 'dashboard.dart';
+import 'dashboardLayout.dart';
+import 'battery.dart';
+import 'database.dart';
+import 'connectionAndParsingHelpers.dart';
+import 'driving.dart';
+import 'consumption.dart';
 
 class CapHelp {
-  static int initcount = 0;
-  static void connect() {
+  CapHelp(this.theContext);
+
+  int initcount = 0;
+  Function dataUpdated;
+  BuildContext theContext;
+  bool ready = true;
+  String recData = '';
+
+  void connect(Function callback) {
     print(theDevice.connected);
 
     bluetooth.onStateChanged().listen((state) {
@@ -21,18 +48,23 @@ class CapHelp {
     try {
       BluetoothConnection.toAddress(theDevice.address).then((connection) {
         print('Connected to the device');
+        callback();
         btConnection = connection;
         initcount = 1;
         var dur = new Duration(milliseconds: 800);
         var tt = new Timer(dur, () {
           print('timer start');
-          sendOut('atz');
+          sendOut('atz'); // reset ELM327
           new Timer(dur, () {
-            sendOut('atsp6');
+            sendOut('atsp6'); // set to protocol 6 (11 bit CAN with 500 kbit)
             new Timer(dur, () {
-              sendOut('ate0');
+              sendOut('ate0'); // echo off
               new Timer(dur, () {
-                sendOut('ath1');
+                sendOut('ath1'); // headers on
+                new Timer(dur, () {
+                  sendOut('ats0'); // spaces off
+                  new Timer(dur, startRequests);
+                });
               });
             });
           });
@@ -51,7 +83,7 @@ class CapHelp {
     }
   }
 
-  static void sendOut(String toSend) {
+  void sendOut(String toSend) {
     //ready = false;
     List<int> bytes = utf8.encode(toSend.trim() + '\r');
     // theSocket.add(bytes);
@@ -61,82 +93,71 @@ class CapHelp {
     // print('\n');
   }
 
-  static void dataHandler(data) {
-    // print(data);
-    if (data != null) {
-      String rec = (new String.fromCharCodes(data));
-      // print('received:');
-      //  print(rec);
-
-      // setState(() {
-      // if (rec.contains('>')) {
-      //  ready = true;
-//        switch(initcount)
-//        {
-//          case 1:{ sendOut('atstff'); print('initializing'); ++initcount; break;}
-//          case 2:{ sendOut('atsp6'); ++initcount;break;}
-//          case 3:{ sendOut('ath1'); ++initcount; break;}
-//          case 4: {sendOut('ate0'); ++initcount; break;}
-//          default: initcount=0;
-//        }
-      // }
-      // setState((){});
-      if (!otherDisplay.contains(">")) {
-        otherDisplay += rec;
+  void startRequests() {
+    var dur = new Duration(milliseconds: 300);
+    for (int i = 0; i < allRequests.length; ++i) {
+      if (ready) {
+        ready = false;
+        new Timer(dur, () => sendOut(allRequests[i][7]));
       } else {
-        print(otherDisplay);
-
-        List<String> recBytes = otherDisplay.trim().split(' ');
-        print('split');
-        print(recBytes);
-
-        if (recBytes.length > 5 && recBytes[1] == '7EC')
-        if(recBytes[2]=='62')
-        {
-          switch (recBytes[3]) {
-            case '20':
-              {
-                switch (recBytes[4]) {
-                  case '01':
-                    {
-                      print('found batt');
-                      dataBase.batteryTemperatures.add(new DoubleData(
-                          _convert1Hex(recBytes[5]).toDouble() - 40,
-                          DateTime.now()));
-                    }
-                    break;
-                }
-              }
-              break;
-            case '22':
-              {}
-              break;
-          }
-        } else if (recBytes[2] == '61') {
-          switch (recBytes[3]) {
-            case '':
-          }
-        } else if (recBytes[3] == '7F') {} //
-        //  });
-        print(dataBase.batteryTemperatures);
-        otherDisplay = rec;
+        --i;
       }
     }
   }
 
-  static int _convert1Hex(String hex) {
-    print(hex.length);
+  void dataHandler(data) {
+     print(data);
+    if (data != null) {
+      String rec = (new String.fromCharCodes(data));
+
+      if (rec.contains('>')) ready = true;
+
+      if (!recData.contains(">")) {
+        recData += rec.trim();
+      } else {
+        print(recData);
+
+        if (recData.length > 5 &&
+            recData.substring(0, 3) ==
+                '7EC') if (recData.substring(5, 7) == '7F')
+          return;
+        else if (recData.substring(5, 7) == '62') {
+          parseReceived(recData.substring(5, 11), recData);
+        }
+        recData = rec.trim();
+      }
+    }
+  }
+
+  void parseReceived(String ident, String rec) {
+    var dataBase = Provider.of<DataBase>(theContext);
+    var def = allRequests[ident];
+    int from = (int.parse(def[1]) ~/ 8)+8;
+    int to = ((int.parse(def[2]) + 1) ~/ 8)+8;
+
+    var valueString = rec.substring(from, to+1);
+    double value = _convert1Hex(valueString).toDouble();
+    print(value);
+    value = value * double.parse(def[3]);
+    value = value - double.parse(def[4]);
+
+    dataBase.add(ident,new DoubleData(value, DateTime.now()));
+    //dataBase.notifyListeners();
+  }
+
+  int _convert1Hex(String hex) {
+    print(hex);
     List<int> integers;
     int result = 0;
     for (int i = 0; i < hex.length; ++i) {
       result += (_convertHexDigit(
-              hex.substring(hex.length - 1 - i, hex.length  - i))) *
+              hex.substring(hex.length - 1 - i, hex.length - i))) *
           pow(16, i);
     }
     return result;
   }
 
-  static int _convertHexDigit(String hex) {
+  int _convertHexDigit(String hex) {
     switch (hex) {
       case '0':
         return 0;
@@ -171,5 +192,10 @@ class CapHelp {
       case 'F':
         return 5;
     }
+  }
+
+  sendTestData(String testData)
+  {
+    dataHandler(utf8.encode(testData));
   }
 }

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:connectivity/connectivity.dart';
 //import 'package:flutter_blue/flutter_blue.dart';
 import 'package:flutter_bluetooth_serial/flutter_bluetooth_serial.dart';
+import 'package:provider/provider.dart';
 
 import 'dart:io';
 import 'dart:convert';
@@ -16,14 +17,16 @@ import 'connectionAndParsingHelpers.dart';
 import 'driving.dart';
 import 'consumption.dart';
 
-void main() => runApp(MyApp());
+void main() => runApp(ChangeNotifierProvider(
+  builder: (context) => DataBase(),
+  child: MyApp(),));
 
 ////////// GLOBALS /////////////////
 
 FlutterBluetoothSerial bluetooth = FlutterBluetoothSerial.instance;
 var btConnection;
 BluetoothDevice theDevice;
-DataBase dataBase = new DataBase.withFakeData();
+//DataBase dataBase = new DataBase.withFakeData();
 String otherDisplay;
 
 ////////////////////////////////////
@@ -71,12 +74,14 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
 
-
   String userInput;
+  var capHelp;
+  var rand = new Random();
 
   @override
   initState() {
     super.initState();
+    capHelp = new CapHelp(context);
    // initBt();
     otherDisplay = theDevice == null ? 'no Bluetooth device selected': "^_^";
   }
@@ -86,14 +91,17 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   void _connect() {
-    setState(() {
-      CapHelp.connect();
-    });
+
+      capHelp.connect((){
+        setState(() {
+          otherDisplay = 'connected';
+        });
+      });
   }
 
-  void dataHandler(data) {
-    CapHelp.dataHandler(data);
-  }
+//  void dataHandler(data) {
+//    capHelp.dataHandler(Provider.of<DataBase>(context),data);
+//  }
 
 // Be sure to cancel subscription after you are done
   @override
@@ -195,9 +203,26 @@ class _MyHomePageState extends State<MyHomePage> {
 
                           onPressed: (userInput != null)
                               ? () {
-                                  CapHelp.sendOut(userInput.trim() );
+                            capHelp.sendOut(userInput.trim() );
                                 }
                               : null,
+                          // color: Colors.red,
+                          // textColor: Colors.yellow,
+                          padding: EdgeInsets.fromLTRB(10, 10, 10, 10),
+                          // splashColor: Colors.grey,
+                        ),
+                      ),
+                      Container(
+                        margin: EdgeInsets.only(left: 15, right: 15),
+                        child: RaisedButton(
+                          child: Text("send test data"),
+                          shape: new RoundedRectangleBorder(
+                              borderRadius: new BorderRadius.circular(10.0)),
+
+                          onPressed:  () {
+                            capHelp.sendTestData('7EC03622001'+ rand.nextInt(10).toString()+ rand.nextInt(10).toString()+'>');
+                          }
+                             ,
                           // color: Colors.red,
                           // textColor: Colors.yellow,
                           padding: EdgeInsets.fromLTRB(10, 10, 10, 10),

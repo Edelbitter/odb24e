@@ -49,11 +49,11 @@ class ConsumptionState extends State<ConsumptionPage> {
             // crossAxisSpacing: 2.0,
             children: <Widget>[
               Center(child:Text("Current Power Consumption")),
-              LineChartTile(data:dataBase.batteryTemperatures),
-              TextTile(data:dataBase.batteryTemperatures.last.data.toString(),unit:'kW'),
+              LineChartTile('622001'),
+              TextTile('622001'),
 
               Center(child:Text("Distribution")),
-              PieChartTile(data: [dataBase.consum12V,dataBase.consumAirCon,dataBase.consumHeat, dataBase.consumDrive ]),
+              PieChartTile(),
 
 
 //              Center(child:Text("Battery Health")),

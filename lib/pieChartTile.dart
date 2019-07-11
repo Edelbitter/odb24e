@@ -10,65 +10,60 @@ import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:charts_flutter/flutter.dart' as charts;
 import 'displayTiles.dart';
 import 'database.dart';
+import 'package:provider/provider.dart';
 
 class PieChartTile extends StatefulWidget {
-
-  List<List> data;
-
-  PieChartTile({this.data}){}
+  PieChartTile() {}
 
   @override
-  PieChartState createState() => PieChartState(data:data);
+  PieChartState createState() => PieChartState();
 }
 
-class PieChartState extends State<PieChartTile>
-{
-  PieChartState({this.data})
-  {
-    comboData = new List<ComboDataPiece>();
+class PieChartState extends State<PieChartTile> {
+  init() {
+    var dataBase = Provider.of<DataBase>(context);
+    print(dataBase);
 
-    comboData.add(new ComboDataPiece('AC',this.data[1][0].data));
-    comboData.add(new ComboDataPiece('12V',this.data[0][0].data));
-    comboData.add(new ComboDataPiece('Heat',this.data[2][0].data));
-    comboData.add(new ComboDataPiece('Drive',this.data[3][0].data));
+    comboData = dataBase.getCombo();
   }
 
   var dtState = new DisplayTileState();
-  List<List> data;
+
   List<ComboDataPiece> comboData;
 
-
   @override
-  Widget build(BuildContext context)
-  {
-    print('printing data');
-    print(data);
+  Widget build(BuildContext context) {
+    init();
+
     return dtState.buildOuter(getDisplay());
   }
 
 // events for update??
-  dynamic getDisplay()
-  {
-    return charts.PieChart(
-        [new charts.Series<ComboDataPiece, String>(
-         // id: 'Battery',
-          //colorFn: (_, __) => charts.MaterialPalette.blue.shadeDefault,
-          domainFn: (ComboDataPiece dat, _) => dat.name,
-          measureFn: (ComboDataPiece dat, _) => dat.value,
-          data: comboData,
-          labelAccessorFn: (ComboDataPiece row, _) => '${row.name}: ${row.value}',
-        )],defaultRenderer: new charts.ArcRendererConfig(arcRendererDecorators: [
-      new charts.ArcLabelDecorator(
-         // labelPosition: charts.ArcLabelPosition.inside
-      )
-    ]));
+  dynamic getDisplay() {
+    return Consumer<DataBase>(
+        builder: (context, dataBase, child) => charts.PieChart([
+              new charts.Series<ComboDataPiece, String>(
+                // id: 'Battery',
+                //colorFn: (_, __) => charts.MaterialPalette.blue.shadeDefault,
+                domainFn: (ComboDataPiece dat, _) => dat.name ?? 'nuuull',
+                measureFn: (ComboDataPiece dat, _) => dat.value,
+                data: comboData,
+                labelAccessorFn: (ComboDataPiece row, _) =>
+                    '${row.name ?? 'meh'}: ${row.value}',
+              )
+            ],
+                defaultRenderer:
+                    new charts.ArcRendererConfig(arcRendererDecorators: [
+                  new charts.ArcLabelDecorator(
+                      // labelPosition: charts.ArcLabelPosition.inside
+                      )
+                ])));
   }
 }
 
-class ComboDataPiece
-{
+class ComboDataPiece {
   String name;
   double value;
 
-  ComboDataPiece(this.name,this.value);
+  ComboDataPiece(this.name, this.value);
 }

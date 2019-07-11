@@ -48,20 +48,20 @@ class BatteryState extends State<BatteryPage> {
             // crossAxisSpacing: 2.0,
             children: <Widget>[
               Center(child:Text("Battery Temperature")),
-              LineChartTile(data:dataBase.batteryTemperatures),
-              TextTile(data:dataBase.batteryTemperatures.last.data.toString(),unit:'°C'),
+              LineChartTile('622001'),
+              TextTile('622001'),
 
               Center(child:Text("State of Charge")),
-              LineChartTile(data:dataBase.soC),
-              TextTile(data:dataBase.soC.last.data.toString(),unit: '%'),
+              LineChartTile('622001'),
+              TextTile('622001'),
 
               Center(child:Text("Battery Health")),
               Center(child:Text("Battery Voltage")),
               Center(child:Text("Battery Current")),
 
-              TextTile(data:'90',unit:'%'),
-              TextTile(data:'399',unit:'V'),
-              TextTile(data:'123',unit:'A'),
+          //    TextTile(data:'90',unit:'%'),
+          //    TextTile(data:'399',unit:'V'),
+         //     TextTile(data:'123',unit:'A'),
 
 
             ],

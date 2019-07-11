@@ -10,43 +10,48 @@ import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:charts_flutter/flutter.dart' as charts;
 import 'displayTiles.dart';
 import 'database.dart';
+import 'package:provider/provider.dart';
+
 
 class LineChartTile extends StatefulWidget {
 
-  List data;
+  String ident;
 
-  LineChartTile({this.data}){}
+  LineChartTile(this.ident){}
 
   @override
-  LineChartState createState() => LineChartState(data:data);
+  LineChartState createState() => LineChartState(ident);
 }
 
 class LineChartState extends State<LineChartTile>
 {
-  LineChartState({this.data}){}
+  LineChartState(this.ident){}
 
   var dtState = new DisplayTileState();
-  List data;
+  String ident;
+  var data;
 
 
   @override
   Widget build(BuildContext context)
   {
-    print('printing data');
-    print(data);
+    var dataBase = Provider.of<DataBase>(context);
+    data = dataBase.rawData[ident];
+
     return dtState.buildOuter(getDisplay());
   }
 
 
   dynamic getDisplay()
   {
-    return charts.TimeSeriesChart(
+    return Consumer<DataBase>(builder: (context,dataBase,child)=>
+      charts.TimeSeriesChart(
      [new charts.Series<DoubleData, DateTime>(
       id: 'Battery',
       colorFn: (_, __) => charts.MaterialPalette.blue.shadeDefault,
       domainFn: (DoubleData dat, _) => dat.time,
       measureFn: (DoubleData dat, _) => dat.data,
       data: data,
-    )]);
+    )]));
   }
 }
