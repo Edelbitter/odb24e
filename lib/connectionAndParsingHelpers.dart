@@ -38,6 +38,8 @@ class CapHelp {
   String recData = '';
 
   void connect(Function callback) {
+    initList();
+
     print(theDevice.connected);
 
     bluetooth.onStateChanged().listen((state) {
@@ -82,6 +84,34 @@ class CapHelp {
       print('Cannot connect, exception occured');
     }
   }
+  List<Tup> requestList = new List();
+  initList() {
+
+    List<Tup> shortList = new List();
+
+    for (int i = 0; i < allRequests.length; ++i) {
+      requestList.add(new Tup(primes[i], allRequests.keys.toList()[i]));
+    }
+    shortList.addAll(requestList); // make a copy of original list
+    int maxMultiplier = requestList.last.prio;
+    int l = requestList.length;
+
+    for (int i = 0; i < l; ++i) {
+      for (int j = 2; j < maxMultiplier; ++j) {
+        requestList.add(new Tup(requestList[i].prio * j, requestList[i].id));
+      }
+    }
+
+    requestList.sort((a, b) {
+      return a.prio.compareTo(b.prio);
+    });
+
+    int last = requestList.indexOf(shortList.last);
+    requestList = requestList.sublist(0,last+1);
+
+   // for(var el in requestList)print(el.id);
+
+  }
 
   void sendOut(String toSend) {
     //ready = false;
@@ -93,18 +123,37 @@ class CapHelp {
     // print('\n');
   }
 
-  int i = 0;
+  int i = 0; // for initial requests
+  int j = 0; // for further requests
   var dur = new Duration(milliseconds: 300);
 
   void startRequests() {
     if (ready) {
       ready = false;
       new Timer(dur, () {
+        print('requesting'+allRequests[i][7]);
         sendOut(allRequests[i++][7]);
         if (i >= allRequests.length) {
-          i = 0;
+          furtherRequests();
         }
+        else
         startRequests();
+      });
+    }
+  }
+
+  void furtherRequests()
+  {
+    if (ready) {
+      ready = false;
+      new Timer(dur, () {
+        print('requesting'+requestList[j].id);
+        sendOut(requestList[j++].id);
+        if (j >= requestList.length) {
+         j=0;
+        }
+
+        furtherRequests();
       });
     }
   }
@@ -135,7 +184,6 @@ class CapHelp {
   }
 
   void parseReceived(String ident, String rec) {
-
     var dataBase = Provider.of<DataBase>(theContext);
     var def = allRequests[ident];
     int from = (int.parse(def[1]) ~/ 8) + 8;
@@ -203,4 +251,10 @@ class CapHelp {
   sendTestData(String testData) {
     dataHandler(utf8.encode(testData));
   }
+}
+
+class Tup {
+  Tup(this.prio, this.id);
+  int prio;
+  String id;
 }
