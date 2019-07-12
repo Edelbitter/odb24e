@@ -52,16 +52,16 @@ class BatteryState extends State<BatteryPage> {
               TextTile('622001'),
 
               Center(child:Text("State of Charge")),
-              LineChartTile('622001'),
-              TextTile('622001'),
+              LineChartTile('622002'),
+              TextTile('622002'),
 
               Center(child:Text("Battery Health")),
               Center(child:Text("Battery Voltage")),
               Center(child:Text("Battery Current")),
 
-          //    TextTile(data:'90',unit:'%'),
-          //    TextTile(data:'399',unit:'V'),
-         //     TextTile(data:'123',unit:'A'),
+              TextTile('623206'),
+              TextTile('623203'),
+              TextTile('623204'),
 
 
             ],

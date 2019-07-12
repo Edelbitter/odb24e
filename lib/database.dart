@@ -12,6 +12,7 @@ Map<String,Queue<DoubleData>> rawData ={
   // SoC
 '622002':new Queue<DoubleData>(),
 '622003':new Queue<DoubleData>(),
+  // distance
 '622006':new Queue<DoubleData>(),
 '62200E':new Queue<DoubleData>(),
 '622051':new Queue<DoubleData>(),
@@ -28,26 +29,50 @@ Map<String,Queue<DoubleData>> rawData ={
 '623458':new Queue<DoubleData>(),
 '6233A7':new Queue<DoubleData>(),
 '623414':new Queue<DoubleData>(),
+  // SoH
+  '623206': new Queue<DoubleData>(),
+  // voltage?
+  '622004': new Queue<DoubleData>(),
+  // voltage?
+'623203':new Queue<DoubleData>(),
+  // current?
+'623204':new Queue<DoubleData>(),
+  // torque?
+  '622243': new Queue<DoubleData>(),
+  // power available for climate
+  '6234C8': new Queue<DoubleData>(),
 };
   List<DoubleData> batteryTemperatures = new List<DoubleData>();
   List<DoubleData> soC = new List<DoubleData>();
 
-  List<DoubleData> consumAirCon = new List<DoubleData>();
+  List<DoubleData> consumAirCon;// = rawData['2233A7'].toList();
   List<DoubleData> consumDrive = new List<DoubleData>();
-  List<DoubleData> consumHeat = new List<DoubleData>();
+ // List<DoubleData> consumHeat = new List<DoubleData>();
   List<DoubleData> consum12V = new List<DoubleData>();
 
   List<ComboDataPiece> getCombo() {
     var comboData = new List<ComboDataPiece>();
+    consumAirCon = rawData['6233A7'].toList();
+    consumDrive = rawData['623459'].toList();
 
-    if (consumHeat.length > 0)
-      comboData.add(new ComboDataPiece('AC', consumHeat.last.data ?? 0));
+  //  if (consumHeat.length > 0)
+  //    comboData.add(new ComboDataPiece('AC', consumHeat.last.data ?? 0));
+ //   else
+ //     comboData.add(new ComboDataPiece('AC', 111));
     if (consumAirCon.length > 0)
-      comboData.add(new ComboDataPiece('12V', consumAirCon.last.data ?? 0));
-    if (consum12V.length > 0)
-      comboData.add(new ComboDataPiece('Heat', consum12V.last.data ?? 0));
+      comboData.add(new ComboDataPiece('AC', consumAirCon.last.data ?? 0));
+    else
+      comboData.add(new ComboDataPiece('AC', 111));
+   // if (consum12V.length > 0)
+   //   comboData.add(new ComboDataPiece('Heat', consum12V.last.data ?? 0));
+   // else
+   //   comboData.add(new ComboDataPiece('Heat', 111));
     if (consumDrive.length > 0)
       comboData.add(new ComboDataPiece('Drive', consumDrive.last.data ?? 0));
+    else
+      comboData.add(new ComboDataPiece('Drive', 111));
+
+    return comboData;
   }
 
   DataBase() ;
@@ -84,7 +109,7 @@ Map<String,Queue<DoubleData>> rawData ={
     db.soC.add(new DoubleData(40, new DateTime(2019, 1, 1, 2, 0, 0)));
     db.consum12V = new List<DoubleData>();
     db.consumAirCon = new List<DoubleData>();
-    db.consumHeat = new List<DoubleData>();
+
     db.consumDrive = new List<DoubleData>();
     db.consum12V.add(new DoubleData(40, new DateTime(2019, 1, 1, 0, 0, 0)));
     db.consum12V.add(new DoubleData(70, new DateTime(2019, 1, 1, 1, 0, 0)));
@@ -92,9 +117,7 @@ Map<String,Queue<DoubleData>> rawData ={
     db.consumAirCon.add(new DoubleData(110, new DateTime(2019, 1, 1, 0, 0, 0)));
     db.consumAirCon.add(new DoubleData(70, new DateTime(2019, 1, 1, 1, 0, 0)));
     db.consumAirCon.add(new DoubleData(40, new DateTime(2019, 1, 1, 2, 0, 0)));
-    db.consumHeat.add(new DoubleData(20, new DateTime(2019, 1, 1, 0, 0, 0)));
-    db.consumHeat.add(new DoubleData(70, new DateTime(2019, 1, 1, 1, 0, 0)));
-    db.consumHeat.add(new DoubleData(40, new DateTime(2019, 1, 1, 2, 0, 0)));
+
     db.consumDrive.add(new DoubleData(300, new DateTime(2019, 1, 1, 0, 0, 0)));
     db.consumDrive.add(new DoubleData(70, new DateTime(2019, 1, 1, 1, 0, 0)));
     db.consumDrive.add(new DoubleData(40, new DateTime(2019, 1, 1, 2, 0, 0)));

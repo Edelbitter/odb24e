@@ -49,8 +49,8 @@ class ConsumptionState extends State<ConsumptionPage> {
             // crossAxisSpacing: 2.0,
             children: <Widget>[
               Center(child:Text("Current Power Consumption")),
-              LineChartTile('622001'),
-              TextTile('622001'),
+              LineChartTile('623459'),
+              TextTile('623459'),
 
               Center(child:Text("Distribution")),
               PieChartTile(),

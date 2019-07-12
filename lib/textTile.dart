@@ -38,7 +38,7 @@ class TextTileState extends State<TextTile>
     var dataBase = Provider.of<DataBase>(context);
 
     if(dataBase.rawData[ident].length>0)
-    data = dataBase.rawData[ident].last.data.toString();
+    data = dataBase.rawData[ident].last.data.toStringAsFixed(1);
     unit = allRequests[ident][6];
     return dtState.buildOuter(getDisplay());
   }
@@ -55,7 +55,7 @@ class TextTileState extends State<TextTile>
       {
         row.add(Text(unit,
             style: TextStyle(
-                inherit: false, fontSize: 30, color: Colors.black)));
+                inherit: false, fontSize: 50, color: Colors.black)));
       }
 
 

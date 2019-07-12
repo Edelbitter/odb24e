@@ -20,11 +20,12 @@ class PieChartTile extends StatefulWidget {
 }
 
 class PieChartState extends State<PieChartTile> {
+
   init() {
     var dataBase = Provider.of<DataBase>(context);
-    print(dataBase);
 
     comboData = dataBase.getCombo();
+    print(comboData);
   }
 
   var dtState = new DisplayTileState();
@@ -51,7 +52,7 @@ class PieChartState extends State<PieChartTile> {
                 labelAccessorFn: (ComboDataPiece row, _) =>
                     '${row.name ?? 'meh'}: ${row.value}',
               )
-            ],
+            ],animate: false,
                 defaultRenderer:
                     new charts.ArcRendererConfig(arcRendererDecorators: [
                   new charts.ArcLabelDecorator(

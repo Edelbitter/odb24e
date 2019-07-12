@@ -48,20 +48,20 @@ class DrivingState extends State<DrivingPage> {
             // crossAxisSpacing: 2.0,
             children: <Widget>[
               Center(child:Text("Power Consumption")),
-              LineChartTile('622001'),
-              TextTile('622001'),
+              LineChartTile('623459'),
+              TextTile('623459'),
 
               Center(child:Text("Remaining Range")),
-              LineChartTile('622001'),
-              TextTile('622001'),
+              LineChartTile('623458'),
+              TextTile('623458'),
 
               Center(child:Text("Speed")),
               Center(child:Text("Torque")),
-              Center(child:Text("Recuperation")),
+              Center(child:Text("Distance")),
 
-            //  TextTile(,unit:'km/h'),
-           //   TextTile(data:'400',unit:'Nm'),
-           //   TextTile(data:'1',unit:'A'),
+              TextTile('622003'),
+              TextTile('622243'),
+              TextTile('622006'),
 
 
             ],

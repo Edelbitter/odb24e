@@ -17,10 +17,12 @@ import 'database.dart';
 import 'connectionAndParsingHelpers.dart';
 import 'driving.dart';
 import 'consumption.dart';
+import 'allRequests.dart';
 
 void main() => runApp(ChangeNotifierProvider(
-  builder: (context) => DataBase(),
-  child: MyApp(),));
+      builder: (context) => DataBase(),
+      child: MyApp(),
+    ));
 
 ////////// GLOBALS /////////////////
 
@@ -74,7 +76,6 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-
   String userInput;
   var capHelp;
   var rand = new Random();
@@ -83,8 +84,8 @@ class _MyHomePageState extends State<MyHomePage> {
   initState() {
     super.initState();
     capHelp = new CapHelp(context);
-   // initBt();
-    otherDisplay = theDevice == null ? 'no Bluetooth device selected': "^_^";
+    // initBt();
+    otherDisplay = theDevice == null ? 'no Bluetooth device selected' : "^_^";
   }
 
   void errorHandler(error, StackTrace trace) {
@@ -92,20 +93,29 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   void _connect() {
-
-      capHelp.connect((){
-        setState(() {
-          otherDisplay = 'connected';
-        });
+    capHelp.connect(() {
+      setState(() {
+        otherDisplay = 'connected';
       });
+    });
   }
 
-  void send()
-  {
-
-
-        new Timer(new Duration(milliseconds: 500),(){ capHelp.sendTestData('7EC03622001'+ rand.nextInt(10).toString()+ rand.nextInt(10).toString()+'>');send();});
-
+  void send() {
+    new Timer(new Duration(milliseconds: 500), () {
+      var nextIndex =
+          allRequests.keys.toList()[rand.nextInt(allRequests.length)];
+      print(nextIndex);
+      capHelp.sendTestData('7EC03' +
+          nextIndex +
+          rand.nextInt(10).toString() +
+          rand.nextInt(10).toString() +
+          rand.nextInt(10).toString() +
+          rand.nextInt(10).toString() +
+          rand.nextInt(10).toString() +
+          rand.nextInt(10).toString() +
+          '>');
+      send();
+    });
   }
 
 //  void dataHandler(data) {
@@ -189,7 +199,6 @@ class _MyHomePageState extends State<MyHomePage> {
                     },
                     padding: EdgeInsets.fromLTRB(10, 10, 10, 10),
                   ),
-
                   Column(
                     children: <Widget>[
                       Container(
@@ -212,7 +221,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
                           onPressed: (userInput != null)
                               ? () {
-                            capHelp.sendOut(userInput.trim() );
+                                  capHelp.sendOut(userInput.trim());
                                 }
                               : null,
                           // color: Colors.red,
@@ -228,8 +237,7 @@ class _MyHomePageState extends State<MyHomePage> {
                           shape: new RoundedRectangleBorder(
                               borderRadius: new BorderRadius.circular(10.0)),
 
-                          onPressed: send
-                             ,
+                          onPressed: send,
                           // color: Colors.red,
                           // textColor: Colors.yellow,
                           padding: EdgeInsets.fromLTRB(10, 10, 10, 10),

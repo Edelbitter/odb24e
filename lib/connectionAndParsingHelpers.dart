@@ -92,28 +92,26 @@ class CapHelp {
     //  print(toSend);
     // print('\n');
   }
-int i = 0;
+
+  int i = 0;
   var dur = new Duration(milliseconds: 300);
+
   void startRequests() {
-
-
-
-      if (ready) {
-        ready = false;
-        new Timer(dur, ()  {
-          sendOut(allRequests[i++][7]);
-          if(i>=allRequests.length)
-            {
-              i = 0;
-            }
-          startRequests();
-        });
-      }
-
+    if (ready) {
+      ready = false;
+      new Timer(dur, () {
+        sendOut(allRequests[i++][7]);
+        if (i >= allRequests.length) {
+          i = 0;
+        }
+        startRequests();
+      });
+    }
   }
 
   void dataHandler(data) {
-     print(data);
+    print('datahandler');
+    print(data);
     if (data != null) {
       String rec = (new String.fromCharCodes(data));
 
@@ -124,9 +122,9 @@ int i = 0;
       } else {
         print(recData);
 
-        if (recData.length > 5 &&
-            recData.substring(0, 3) ==
-                '7EC') if (recData.substring(5, 7) == '7F')
+        if (recData.length > 5 && recData.substring(0, 3) == '7EC') if (recData
+                .substring(5, 7) ==
+            '7F')
           return;
         else if (recData.substring(5, 7) == '62') {
           parseReceived(recData.substring(5, 11), recData);
@@ -137,18 +135,19 @@ int i = 0;
   }
 
   void parseReceived(String ident, String rec) {
+
     var dataBase = Provider.of<DataBase>(theContext);
     var def = allRequests[ident];
-    int from = (int.parse(def[1]) ~/ 8)+8;
-    int to = ((int.parse(def[2]) + 1) ~/ 8)+8;
+    int from = (int.parse(def[1]) ~/ 8) + 8;
+    int to = ((int.parse(def[2]) + 1) ~/ 8) + 8;
 
-    var valueString = rec.substring(from, to+1);
+    var valueString = rec.substring(from, to + 1);
     double value = _convert1Hex(valueString).toDouble();
     print(value);
     value = value * double.parse(def[3]);
     value = value - double.parse(def[4]);
 
-    dataBase.add(ident,new DoubleData(value, DateTime.now()));
+    dataBase.add(ident, new DoubleData(value, DateTime.now()));
     //dataBase.notifyListeners();
   }
 
@@ -201,8 +200,7 @@ int i = 0;
     }
   }
 
-  sendTestData(String testData)
-  {
+  sendTestData(String testData) {
     dataHandler(utf8.encode(testData));
   }
 }
