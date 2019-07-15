@@ -271,11 +271,11 @@ class _MyHomePageState extends State<MyHomePage> {
                       Container(
                         margin: EdgeInsets.only(left: 15, right: 15),
                         child: RaisedButton(
-                          child: Text("send test data"),
+                          child: Text("send startup commands"),
                           shape: new RoundedRectangleBorder(
                               borderRadius: new BorderRadius.circular(10.0)),
 
-                          onPressed: send,
+                          onPressed: capHelp.sendStartupCommands,
                           // color: Colors.red,
                           // textColor: Colors.yellow,
                           padding: EdgeInsets.fromLTRB(10, 10, 10, 10),

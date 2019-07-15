@@ -62,6 +62,9 @@ class BatteryState extends State<BatteryPage> {
               TextTile('623206'),
               TextTile('623203'),
               TextTile('623204'),
+      Center(child:Text("12V Charger")),
+              TextTile('623022'),
+              TextTile('622005'),
 
 
             ],
@@ -76,6 +79,9 @@ class BatteryState extends State<BatteryPage> {
               const StaggeredTile.count(4, 1),
               const StaggeredTile.count(4, 1),
               const StaggeredTile.count(4, 3),
+              const StaggeredTile.count(4, 3),
+              const StaggeredTile.count(4, 3),
+              const StaggeredTile.count(4, 1),
               const StaggeredTile.count(4, 3),
               const StaggeredTile.count(4, 3),
 

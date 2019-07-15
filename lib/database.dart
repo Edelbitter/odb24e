@@ -41,6 +41,10 @@ Map<String,Queue<DoubleData>> rawData ={
   '622243': new Queue<DoubleData>(),
   // power available for climate
   '6234C8': new Queue<DoubleData>(),
+  // DCDC On/off
+  '623022': new Queue<DoubleData>(),
+  // 14V
+  '622005': new Queue<DoubleData>(),
 };
   List<DoubleData> batteryTemperatures = new List<DoubleData>();
   List<DoubleData> soC = new List<DoubleData>();

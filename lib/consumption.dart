@@ -49,8 +49,10 @@ class ConsumptionState extends State<ConsumptionPage> {
             // crossAxisSpacing: 2.0,
             children: <Widget>[
               Center(child:Text("Current Power Consumption")),
-              LineChartTile('623459'),
+           //   LineChartTile('623459'),
               TextTile('623459'),
+              TextTile('623457'),
+              TextTile('623478'),
 
               Center(child:Text("Distribution")),
               PieChartTile(),
@@ -68,7 +70,8 @@ class ConsumptionState extends State<ConsumptionPage> {
             ],
             staggeredTiles: const <StaggeredTile>[
               const StaggeredTile.count(12, 1),
-              const StaggeredTile.count(8, 3),
+              const StaggeredTile.count(4, 3),
+              const StaggeredTile.count(4, 3),
               const StaggeredTile.count(4, 3),
               const StaggeredTile.count(12, 1),
               const StaggeredTile.count(12, 12),

@@ -74,24 +74,6 @@ class CapHelp {
         callback();
         btConnection = connection;
         initcount = 1;
-        var dur = new Duration(milliseconds: 800);
-        new Timer(dur, () {
-          print('timer start');
-          sendOut('atz'); // reset ELM327
-          new Timer(dur, () {
-            sendOut('atsp6'); // set to protocol 6 (11 bit CAN with 500 kbit)
-            new Timer(dur, () {
-              sendOut('ate0'); // echo off
-              new Timer(dur, () {
-                sendOut('ath1'); // headers on
-                new Timer(dur, () {
-                  sendOut('ats0'); // spaces off
-                  new Timer(dur, startRequests);
-                });
-              });
-            });
-          });
-        });
 
         connection.input.listen(dataHandler, onError: (err) {
           print('cannot connect');
@@ -114,7 +96,7 @@ class CapHelp {
     List<Tup> shortList = new List();
 
     for (int i = 0; i < allRequests.length; ++i) {
-      requestList.add(new Tup(primes[i], allRequests.keys.toList()[i]));
+      requestList.add(new Tup(primes[i], allRequests.keys.toList()[i].replaceRange(0, 1, '2')));
     }
     shortList.addAll(requestList); // make a copy of original list
     int maxMultiplier = requestList.last.prio;
@@ -132,12 +114,44 @@ class CapHelp {
 
     int last = requestList.indexOf(shortList.last);
     requestList = requestList.sublist(0, last + 1);
+    justRequests = shortList;//allRequests.values.toList();
+    i=0;
+    j=0;
+    sendOut('');
 
-   // for (var el in requestList) print(el.id);
+    // for (var el in requestList) print(el.id);
+    startRequests();
+  }
+
+  sendStartupCommands()
+  {
+    var dur = new Duration(milliseconds: 1000);
+    new Timer(dur, () {
+      print('timer start');
+      sendOut('atz'); // reset ELM327
+      new Timer(dur, () {
+        sendOut('atsp6'); // set to protocol 6 (11 bit CAN with 500 kbit)
+        new Timer(dur, () {
+          sendOut('ate0'); // echo off
+          new Timer(dur, () {
+            sendOut('ath1'); // headers on
+            new Timer(dur, () {
+              sendOut('ats0'); // spaces off
+              new Timer(dur, ()
+              {
+                sendOut('atstff'); // timeout
+              });    //  new Timer(dur, startRequests);
+            });
+          });
+        });
+      });
+    });
+
   }
 
   void sendOut(String toSend) {
-    //ready = false;
+    ready = false;
+    print(toSend);
     List<int> bytes = utf8.encode(toSend.trim() + '\r');
     // theSocket.add(bytes);
     btConnection.output.add(bytes);
@@ -148,51 +162,63 @@ class CapHelp {
 
   int i = 0; // for initial requests
   int j = 0; // for further requests
-  var dur = new Duration(milliseconds: 300);
+  var dur = new Duration(milliseconds: 1100);
+  var justRequests;
 
   void startRequests() {
 
       new Timer(dur, () {
-        print('requesting' + allRequests.keys.toList()[i]);
-        sendOut(allRequests.keys.toList()[i++]);
+        if(!ready) {
+          print('waiting');
+          sendOut('');
+          startRequests();
+        }
+        else{
+        print('requesting ' + justRequests[i].id);
+          sendOut(justRequests[i++].id.trim());
         if (i >= allRequests.length) {
           furtherRequests();
         } else
           startRequests();
-      });
+      }});
   }
 
   void furtherRequests() {
 
       new Timer(dur, () {
-        print('requesting' + requestList[j].id);
-        sendOut(requestList[j++].id);
+        if(!ready) {
+          print('waiting');
+          sendOut('');
+          furtherRequests();
+        }
+        else{
+          sendOut(requestList[j++].id);
         if (j >= requestList.length) {
           j = 0;
         }
         furtherRequests();
-      });
+      }});
   }
 
   void dataHandler(data) {
 
     if (data != null) {
       String rec = (new String.fromCharCodes(data));
-
+print(rec);
       if (!recData.contains(">")) {
         recData += rec.trim();
       } else {
         ready = true;
-        print('receiving');
-        print(recData);
 
-        if (recData.length > 5 && recData.substring(0, 3) == '7EC') if (recData
-                .substring(5, 7) ==
-            '7F')
-          return;
+
+        if (recData.length > 5 && recData.substring(0, 3) == '7EC') {
+          if (recData.substring(5, 7) == '7F') {
+          print('no data');
+          //return;
+        }
         else if (recData.substring(5, 7) == '62') {
           parseReceived(recData.substring(5, 11), recData);
-        }
+        }}
         recData = rec.trim();
       }
     }
@@ -203,15 +229,14 @@ class CapHelp {
     var def = allRequests[ident];
     int from = ((int.parse(def[1]) - 24) ~/ 4) + 11;
     int to = ((int.parse(def[2]) + 1 - 24) ~/ 4) + 11;
-    print('parsing');
-    print(from);
-    print(to);
-    print(rec);
+
     var valueString = rec.substring(from, to );
     double value = _convert1Hex(valueString).toDouble();
     print(value);
+    print(double.parse(def[3]));
     value = value * double.parse(def[3]);
     value = value - double.parse(def[4]);
+    print(value);
 
     dataBase.add(ident, new DoubleData(value, DateTime.now()));
     //dataBase.notifyListeners();
@@ -228,10 +253,12 @@ class CapHelp {
               hex.substring(hex.length - 1 - i, hex.length - i))) *
           pow(16, i);
     }
+
     return result;
   }
 
   int _convertHexDigit(String hex) {
+
     switch (hex) {
       case '0':
         return 0;
@@ -264,7 +291,7 @@ class CapHelp {
       case 'E':
         return 14;
       case 'F':
-        return 5;
+        return 15;
       default:
         return 0;
     }
