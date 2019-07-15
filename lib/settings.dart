@@ -18,34 +18,19 @@ class SettingsPage extends StatefulWidget {
 
 class SettingsState extends State<SettingsPage> {
 
-  List<BluetoothDevice> bondedDevices = [];
-  SharedPreferences prefs;
+  var bonded;
 
 
   @override
   initState() {
-  initBT();
 
+  setState(() {
+    bonded = capHelp.bondedDevices;
+  });
 
   }
 
-  initBT()
-  {
-    bluetooth.getBondedDevices().then((dev) {
-      setState(() {
-        bondedDevices = dev;
-      });
-      SharedPreferences.getInstance().then((pre) {
-        prefs = pre;
-        var savedDev = prefs.getString('btDevice');
-        if(savedDev != null)
-        {
-          theDevice = bondedDevices.firstWhere((b)=>b.name == savedDev,orElse: ()=> null);
-          print(theDevice.name);
-        }
-      });
-    });
-  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -95,11 +80,11 @@ class SettingsState extends State<SettingsPage> {
                       onChanged: (BluetoothDevice newValue) {
                         setState(() {
                           theDevice = newValue;
-                          otherDisplay = '^_^';
-                          prefs.setString('btDevice',theDevice.name);
+                          otherDisplay = theDevice.name + ' *new';
+                          capHelp.prefs.setString('btDevice',theDevice.name);
                         });
                       },
-                      items: bondedDevices
+                      items: capHelp.bondedDevices
                           .map<DropdownMenuItem<BluetoothDevice>>((BluetoothDevice value) {
                         return DropdownMenuItem<BluetoothDevice>(
                           value: value,

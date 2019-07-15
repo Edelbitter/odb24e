@@ -31,6 +31,7 @@ var btConnection;
 BluetoothDevice theDevice;
 //DataBase dataBase = new DataBase.withFakeData();
 String otherDisplay;
+var capHelp;
 
 ////////////////////////////////////
 
@@ -77,15 +78,20 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   String userInput;
-  var capHelp;
+
   var rand = new Random();
 
   @override
   initState() {
     super.initState();
     capHelp = new CapHelp(context);
+    capHelp.initBT(callback: () {
+      setState(() {
+        otherDisplay =
+            theDevice == null ? 'no Bluetooth device selected' : theDevice.name;
+      });
+    });
     // initBt();
-    otherDisplay = theDevice == null ? 'no Bluetooth device selected' : "^_^";
   }
 
   void errorHandler(error, StackTrace trace) {
@@ -95,7 +101,7 @@ class _MyHomePageState extends State<MyHomePage> {
   void _connect() {
     capHelp.connect(() {
       setState(() {
-        otherDisplay = 'connected';
+        otherDisplay += ' connected';
       });
     });
   }
@@ -105,7 +111,8 @@ class _MyHomePageState extends State<MyHomePage> {
       var nextIndex =
           allRequests.keys.toList()[rand.nextInt(allRequests.length)];
       print(nextIndex);
-      capHelp.sendTestData('7EC03' +
+      print('sending');
+      String nextData = '7EC03' +
           nextIndex +
           rand.nextInt(10).toString() +
           rand.nextInt(10).toString() +
@@ -113,7 +120,24 @@ class _MyHomePageState extends State<MyHomePage> {
           rand.nextInt(10).toString() +
           rand.nextInt(10).toString() +
           rand.nextInt(10).toString() +
-          '>');
+          rand.nextInt(10).toString() +
+          rand.nextInt(10).toString() +
+          rand.nextInt(10).toString() +
+          rand.nextInt(10).toString() +
+          rand.nextInt(10).toString() +
+          rand.nextInt(10).toString() +
+          rand.nextInt(10).toString() +
+          rand.nextInt(10).toString() +
+          rand.nextInt(10).toString() +
+          rand.nextInt(10).toString() +
+          rand.nextInt(10).toString() +
+          rand.nextInt(10).toString() +
+          rand.nextInt(10).toString() +
+          rand.nextInt(10).toString() +
+          rand.nextInt(10).toString() +
+          '>';
+      print(nextData);
+      capHelp.sendTestData(nextData);
       send();
     });
   }
@@ -172,33 +196,37 @@ class _MyHomePageState extends State<MyHomePage> {
                     },
                     padding: EdgeInsets.fromLTRB(10, 10, 10, 10),
                   ),
-                  RaisedButton(
-                    child: Text("Battery Data"),
-                    shape: new RoundedRectangleBorder(
-                        borderRadius: new BorderRadius.circular(10.0)),
-                    onPressed: () {
-                      Navigator.pushNamed(context, '/battery');
-                    },
-                    padding: EdgeInsets.fromLTRB(10, 10, 10, 10),
-                  ),
-                  RaisedButton(
-                    child: Text("Driving Data"),
-                    shape: new RoundedRectangleBorder(
-                        borderRadius: new BorderRadius.circular(10.0)),
-                    onPressed: () {
-                      Navigator.pushNamed(context, '/drive');
-                    },
-                    padding: EdgeInsets.fromLTRB(10, 10, 10, 10),
-                  ),
-                  RaisedButton(
-                    child: Text("Consumption"),
-                    shape: new RoundedRectangleBorder(
-                        borderRadius: new BorderRadius.circular(10.0)),
-                    onPressed: () {
-                      Navigator.pushNamed(context, '/consum');
-                    },
-                    padding: EdgeInsets.fromLTRB(10, 10, 10, 10),
-                  ),
+                  Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+                    RaisedButton(
+                      child: Text("Battery Data"),
+                      shape: new RoundedRectangleBorder(
+                          borderRadius: new BorderRadius.circular(10.0)),
+                      onPressed: () {
+                        Navigator.pushNamed(context, '/battery');
+                      },
+                      padding: EdgeInsets.fromLTRB(10, 10, 10, 10),
+                    ),
+                    VerticalDivider(),
+                    RaisedButton(
+                      child: Text("Driving Data"),
+                      shape: new RoundedRectangleBorder(
+                          borderRadius: new BorderRadius.circular(10.0)),
+                      onPressed: () {
+                        Navigator.pushNamed(context, '/drive');
+                      },
+                      padding: EdgeInsets.fromLTRB(10, 10, 10, 10),
+                    ),
+                    VerticalDivider(),
+                    RaisedButton(
+                      child: Text("Consumption"),
+                      shape: new RoundedRectangleBorder(
+                          borderRadius: new BorderRadius.circular(10.0)),
+                      onPressed: () {
+                        Navigator.pushNamed(context, '/consum');
+                      },
+                      padding: EdgeInsets.fromLTRB(10, 10, 10, 10),
+                    ),
+                  ]),
                   Column(
                     children: <Widget>[
                       Container(
@@ -218,12 +246,22 @@ class _MyHomePageState extends State<MyHomePage> {
                           child: Text("send custom"),
                           shape: new RoundedRectangleBorder(
                               borderRadius: new BorderRadius.circular(10.0)),
-
                           onPressed: (userInput != null)
                               ? () {
                                   capHelp.sendOut(userInput.trim());
                                 }
                               : null,
+                          padding: EdgeInsets.fromLTRB(10, 10, 10, 10),
+                        ),
+                      ),
+                      Container(
+                        margin: EdgeInsets.only(left: 15, right: 15),
+                        child: RaisedButton(
+                          child: Text("ready request list"),
+                          shape: new RoundedRectangleBorder(
+                              borderRadius: new BorderRadius.circular(10.0)),
+
+                          onPressed: capHelp.initList,
                           // color: Colors.red,
                           // textColor: Colors.yellow,
                           padding: EdgeInsets.fromLTRB(10, 10, 10, 10),

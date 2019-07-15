@@ -14,6 +14,8 @@ import 'package:connectivity/connectivity.dart';
 //import 'package:flutter_blue/flutter_blue.dart';
 import 'package:flutter_bluetooth_serial/flutter_bluetooth_serial.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
 
 import 'dart:io';
 import 'dart:convert';
@@ -36,10 +38,29 @@ class CapHelp {
   BuildContext theContext;
   bool ready = true;
   String recData = '';
+  List<BluetoothDevice> bondedDevices = [];
+  SharedPreferences prefs;
+
+
+  initBT({Function callback})
+  {
+    bluetooth.getBondedDevices().then((dev) {
+      bondedDevices = dev;
+      SharedPreferences.getInstance().then((pre) {
+        prefs = pre;
+        var savedDev = prefs.getString('btDevice');
+        if(savedDev != null)
+        {
+          theDevice = bondedDevices.firstWhere((b)=>b.name == savedDev,orElse: ()=> null);
+          print(theDevice.name);
+          if(callback != null)callback();
+          //  return dev;
+        }
+      });
+    });
+  }
 
   void connect(Function callback) {
-    initList();
-
     print(theDevice.connected);
 
     bluetooth.onStateChanged().listen((state) {
@@ -54,7 +75,7 @@ class CapHelp {
         btConnection = connection;
         initcount = 1;
         var dur = new Duration(milliseconds: 800);
-        var tt = new Timer(dur, () {
+        new Timer(dur, () {
           print('timer start');
           sendOut('atz'); // reset ELM327
           new Timer(dur, () {
@@ -84,9 +105,12 @@ class CapHelp {
       print('Cannot connect, exception occured');
     }
   }
-  List<Tup> requestList = new List();
-  initList() {
 
+  List<Tup> requestList = new List();
+
+  void initList() {
+    print('initializing request list');
+    requestList.clear();
     List<Tup> shortList = new List();
 
     for (int i = 0; i < allRequests.length; ++i) {
@@ -107,10 +131,9 @@ class CapHelp {
     });
 
     int last = requestList.indexOf(shortList.last);
-    requestList = requestList.sublist(0,last+1);
+    requestList = requestList.sublist(0, last + 1);
 
-   // for(var el in requestList)print(el.id);
-
+   // for (var el in requestList) print(el.id);
   }
 
   void sendOut(String toSend) {
@@ -128,47 +151,39 @@ class CapHelp {
   var dur = new Duration(milliseconds: 300);
 
   void startRequests() {
-    if (ready) {
-      ready = false;
+
       new Timer(dur, () {
-        print('requesting'+allRequests[i][7]);
-        sendOut(allRequests[i++][7]);
+        print('requesting' + allRequests.keys.toList()[i]);
+        sendOut(allRequests.keys.toList()[i++]);
         if (i >= allRequests.length) {
           furtherRequests();
-        }
-        else
-        startRequests();
+        } else
+          startRequests();
       });
-    }
   }
 
-  void furtherRequests()
-  {
-    if (ready) {
-      ready = false;
+  void furtherRequests() {
+
       new Timer(dur, () {
-        print('requesting'+requestList[j].id);
+        print('requesting' + requestList[j].id);
         sendOut(requestList[j++].id);
         if (j >= requestList.length) {
-         j=0;
+          j = 0;
         }
-
         furtherRequests();
       });
-    }
   }
 
   void dataHandler(data) {
-    print('datahandler');
-    print(data);
+
     if (data != null) {
       String rec = (new String.fromCharCodes(data));
-
-      if (rec.contains('>')) ready = true;
 
       if (!recData.contains(">")) {
         recData += rec.trim();
       } else {
+        ready = true;
+        print('receiving');
         print(recData);
 
         if (recData.length > 5 && recData.substring(0, 3) == '7EC') if (recData
@@ -186,10 +201,13 @@ class CapHelp {
   void parseReceived(String ident, String rec) {
     var dataBase = Provider.of<DataBase>(theContext);
     var def = allRequests[ident];
-    int from = (int.parse(def[1]) ~/ 8) + 8;
-    int to = ((int.parse(def[2]) + 1) ~/ 8) + 8;
-
-    var valueString = rec.substring(from, to + 1);
+    int from = ((int.parse(def[1]) - 24) ~/ 4) + 11;
+    int to = ((int.parse(def[2]) + 1 - 24) ~/ 4) + 11;
+    print('parsing');
+    print(from);
+    print(to);
+    print(rec);
+    var valueString = rec.substring(from, to );
     double value = _convert1Hex(valueString).toDouble();
     print(value);
     value = value * double.parse(def[3]);
@@ -200,8 +218,10 @@ class CapHelp {
   }
 
   int _convert1Hex(String hex) {
+    if (hex == null) return 0;
+    print('converting');
     print(hex);
-    List<int> integers;
+
     int result = 0;
     for (int i = 0; i < hex.length; ++i) {
       result += (_convertHexDigit(
@@ -245,6 +265,8 @@ class CapHelp {
         return 14;
       case 'F':
         return 5;
+      default:
+        return 0;
     }
   }
 
