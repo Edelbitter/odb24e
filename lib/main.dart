@@ -26,12 +26,8 @@ void main() => runApp(ChangeNotifierProvider(
 
 ////////// GLOBALS /////////////////
 
-FlutterBluetoothSerial bluetooth = FlutterBluetoothSerial.instance;
-var btConnection;
-BluetoothDevice theDevice;
 //DataBase dataBase = new DataBase.withFakeData();
 String otherDisplay;
-var capHelp;
 
 ////////////////////////////////////
 
@@ -78,6 +74,8 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   String userInput;
+  var capHelp;
+  int connected = 0;
 
   var rand = new Random();
 
@@ -87,11 +85,15 @@ class _MyHomePageState extends State<MyHomePage> {
     capHelp = new CapHelp(context);
     capHelp.initBT(callback: () {
       setState(() {
-        otherDisplay =
-            theDevice == null ? 'no Bluetooth device selected' : theDevice.name;
+        otherDisplay = capHelp.theDevice == null
+            ? 'No Bluetooth Device Selected'
+            : capHelp.theDevice.name;
       });
     });
     // initBt();
+  //  var dataBase = Provider.of<DataBase>(context);
+  //  if(dataBase==null)
+     // dataBase.initRaw();
   }
 
   void errorHandler(error, StackTrace trace) {
@@ -102,43 +104,16 @@ class _MyHomePageState extends State<MyHomePage> {
     capHelp.connect(() {
       setState(() {
         otherDisplay += ' connected';
+        connected = 1;
       });
-    });
-  }
-
-  void send() {
-    new Timer(new Duration(milliseconds: 500), () {
-      var nextIndex =
-          allRequests.keys.toList()[rand.nextInt(allRequests.length)];
-      print(nextIndex);
-      print('sending');
-      String nextData = '7EC03' +
-          nextIndex +
-          rand.nextInt(10).toString() +
-          rand.nextInt(10).toString() +
-          rand.nextInt(10).toString() +
-          rand.nextInt(10).toString() +
-          rand.nextInt(10).toString() +
-          rand.nextInt(10).toString() +
-          rand.nextInt(10).toString() +
-          rand.nextInt(10).toString() +
-          rand.nextInt(10).toString() +
-          rand.nextInt(10).toString() +
-          rand.nextInt(10).toString() +
-          rand.nextInt(10).toString() +
-          rand.nextInt(10).toString() +
-          rand.nextInt(10).toString() +
-          rand.nextInt(10).toString() +
-          rand.nextInt(10).toString() +
-          rand.nextInt(10).toString() +
-          rand.nextInt(10).toString() +
-          rand.nextInt(10).toString() +
-          rand.nextInt(10).toString() +
-          rand.nextInt(10).toString() +
-          '>';
-      print(nextData);
-      capHelp.sendTestData(nextData);
-      send();
+    }, () {
+      setState(() {
+        connected = 0;
+      });
+    }, () {
+      setState(() {
+        connected = 2;
+      });
     });
   }
 
@@ -154,6 +129,8 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   Widget build(BuildContext context) {
+
+
     return Container(
         decoration: BoxDecoration(
           image: DecorationImage(
@@ -165,142 +142,217 @@ class _MyHomePageState extends State<MyHomePage> {
           backgroundColor: Colors.transparent,
           appBar: AppBar(
             title: Text(widget.title),
+            actions: <Widget>[
+              connected == 1
+                  ? Icon(
+                      Icons.bluetooth_connected,
+                      color: Colors.green,
+                    )
+                  : connected == 0
+                      ? Icon(Icons.bluetooth_searching, color: Colors.red)
+                      : Icon(
+                          Icons.bluetooth_searching,
+                          color: Colors.yellow,
+                        ),
+              VerticalDivider(),
+            ],
           ),
-          body: Container(
-            child: Center(
-              child: Column(
-                // Invoke "debug painting" (press "p" in the console, choose the
-                // "Toggle Debug Paint" action from the Flutter Inspector in Android
-                // Studio, or the "Toggle Debug Paint" command in Visual Studio Code)
-                // to see the wireframe for each widget.
-                mainAxisAlignment: MainAxisAlignment.center,
+          bottomNavigationBar: BottomAppBar(
+            color: Theme.of(context).primaryColor,
+            child: new Row(
+                mainAxisSize: MainAxisSize.max,
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: <Widget>[
-                  Container(
-                    margin: EdgeInsets.only(left: 15, right: 15),
-                    child: TextFormField(
-                      textDirection: TextDirection.ltr,
-                      onFieldSubmitted: (res) {
-                        userInput = res;
-                      },
-                      decoration: InputDecoration(
-                        border: OutlineInputBorder(),
+                  Row(
+                    children: [
+                      IconButton(
+                        icon: Icon(Icons.bluetooth),
+                        onPressed: () {},
                       ),
-                    ),
-                  ),
-                  RaisedButton(
-                    child: Text("Dashboard"),
-                    shape: new RoundedRectangleBorder(
-                        borderRadius: new BorderRadius.circular(10.0)),
-                    onPressed: () {
-                      Navigator.pushNamed(context, '/dashboard');
-                    },
-                    padding: EdgeInsets.fromLTRB(10, 10, 10, 10),
-                  ),
-                  Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-                    RaisedButton(
-                      child: Text("Battery Data"),
-                      shape: new RoundedRectangleBorder(
-                          borderRadius: new BorderRadius.circular(10.0)),
-                      onPressed: () {
-                        Navigator.pushNamed(context, '/battery');
-                      },
-                      padding: EdgeInsets.fromLTRB(10, 10, 10, 10),
-                    ),
-                    VerticalDivider(),
-                    RaisedButton(
-                      child: Text("Driving Data"),
-                      shape: new RoundedRectangleBorder(
-                          borderRadius: new BorderRadius.circular(10.0)),
-                      onPressed: () {
-                        Navigator.pushNamed(context, '/drive');
-                      },
-                      padding: EdgeInsets.fromLTRB(10, 10, 10, 10),
-                    ),
-                    VerticalDivider(),
-                    RaisedButton(
-                      child: Text("Consumption"),
-                      shape: new RoundedRectangleBorder(
-                          borderRadius: new BorderRadius.circular(10.0)),
-                      onPressed: () {
-                        Navigator.pushNamed(context, '/consum');
-                      },
-                      padding: EdgeInsets.fromLTRB(10, 10, 10, 10),
-                    ),
-                  ]),
-                  Column(
-                    children: <Widget>[
-                      Container(
-                        margin: EdgeInsets.only(left: 15, right: 15),
-                        child: RaisedButton(
-                          child: Text("Start Communication"),
-                          shape: new RoundedRectangleBorder(
-                              borderRadius: new BorderRadius.circular(10.0)),
-                          onPressed: _connect,
-                          padding: EdgeInsets.fromLTRB(10, 10, 10, 10),
-                          // splashColor: Colors.grey,
-                        ),
-                      ),
-                      Container(
-                        margin: EdgeInsets.only(left: 15, right: 15),
-                        child: RaisedButton(
-                          child: Text("send custom"),
-                          shape: new RoundedRectangleBorder(
-                              borderRadius: new BorderRadius.circular(10.0)),
-                          onPressed: (userInput != null)
-                              ? () {
-                                  capHelp.sendOut(userInput.trim());
-                                }
-                              : null,
-                          padding: EdgeInsets.fromLTRB(10, 10, 10, 10),
-                        ),
-                      ),
-                      Container(
-                        margin: EdgeInsets.only(left: 15, right: 15),
-                        child: RaisedButton(
-                          child: Text("ready request list"),
-                          shape: new RoundedRectangleBorder(
-                              borderRadius: new BorderRadius.circular(10.0)),
-
-                          onPressed: capHelp.initList,
-                          // color: Colors.red,
-                          // textColor: Colors.yellow,
-                          padding: EdgeInsets.fromLTRB(10, 10, 10, 10),
-                          // splashColor: Colors.grey,
-                        ),
-                      ),
-                      Container(
-                        margin: EdgeInsets.only(left: 15, right: 15),
-                        child: RaisedButton(
-                          child: Text("send startup commands"),
-                          shape: new RoundedRectangleBorder(
-                              borderRadius: new BorderRadius.circular(10.0)),
-
-                          onPressed: capHelp.sendStartupCommands,
-                          // color: Colors.red,
-                          // textColor: Colors.yellow,
-                          padding: EdgeInsets.fromLTRB(10, 10, 10, 10),
-                          // splashColor: Colors.grey,
-                        ),
-                      ),
-                      Text(
-                        otherDisplay ?? "horst",
-                        style: Theme.of(context).textTheme.display1,
-                      ),
+                      Text(otherDisplay ?? ''),
+                      //  IconButton(icon: Icon(Icons.search), onPressed: () {},),
                     ],
-                  )
-                ],
-              ),
-            ),
+                  ),
+                  IconButton(
+                    icon: Icon(
+                      Icons.settings,
+                    ),
+                    onPressed: () {
+                      Navigator.pushNamed(context, '/settings',
+                          arguments: capHelp);
+                    },
+                  ),
+                  //    margin: EdgeInsets.fromLTRB(10, 10, 10, 10),
+                ]),
           ),
 
-          floatingActionButton: FloatingActionButton(
-            //  onPressed: await  _getDisplay(),
-            onPressed: () {
-              Navigator.pushNamed(context, '/settings');
-            },
-            tooltip: 'Einstellungen',
-            child: Icon(Icons.settings),
-          ), // This trailing comma makes auto-formatting nicer for build methods.
+          body: Container(
+            margin: EdgeInsets.only(left: 15, right: 15),
+            child: Center(
+                child: Column(children: <Widget>[
+              Divider(),
+              Divider(),
+
+//                  Container(
+
+//                    child: TextFormField(
+//                      textDirection: TextDirection.ltr,
+//                      onFieldSubmitted: (res) {
+//                        userInput = res;
+//                      },
+//                      decoration: InputDecoration(
+//                        border: OutlineInputBorder(),
+//                      ),
+//                    ),
+//                  ),
+//                  RaisedButton(
+//                    child: Text("Dashboard"),
+//                    shape: new RoundedRectangleBorder(
+//                        borderRadius: new BorderRadius.circular(10.0)),
+//                    onPressed: () {
+//                      Navigator.pushNamed(context, '/dashboard');
+//                    },
+//                    padding: EdgeInsets.fromLTRB(10, 10, 10, 10),
+//                  ),
+
+              RaisedButton(
+                child:
+                    Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+                  Icon(Icons.battery_charging_full),
+                  //  VerticalDivider(),
+                  Text(' Battery Data')
+                ]),
+                shape: new RoundedRectangleBorder(
+                    borderRadius: new BorderRadius.circular(10.0)),
+                onPressed: () {
+                  Navigator.pushNamed(context, '/battery');
+                },
+                padding: EdgeInsets.fromLTRB(10, 10, 10, 10),
+              ),
+              Divider(),
+              RaisedButton(
+                child:
+                    Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+                  Icon(Icons.directions_car),
+                  // VerticalDivider(),
+                  Text(' Driving Data')
+                ]),
+                shape: new RoundedRectangleBorder(
+                    borderRadius: new BorderRadius.circular(10.0)),
+                onPressed: () {
+                  Navigator.pushNamed(context, '/drive');
+                },
+                padding: EdgeInsets.fromLTRB(10, 10, 10, 10),
+              ),
+              Divider(),
+              RaisedButton(
+                child:
+                    Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+                  Icon(Icons.ev_station),
+                  // VerticalDivider(),
+                  Text(' Consumption Data')
+                ]),
+                shape: new RoundedRectangleBorder(
+                    borderRadius: new BorderRadius.circular(10.0)),
+                onPressed: () {
+                  Navigator.pushNamed(context, '/consum');
+                },
+                padding: EdgeInsets.fromLTRB(10, 10, 10, 10),
+              ),
+
+//                      Container(
+//                        margin: EdgeInsets.only(left: 15, right: 15),
+//                        child: RaisedButton(
+//                          child: Text("send custom"),
+//                          shape: new RoundedRectangleBorder(
+//                              borderRadius: new BorderRadius.circular(10.0)),
+//                          onPressed: (userInput != null)
+//                              ? () {
+//                                  capHelp.sendOut(userInput.trim());
+//                                }
+//                              : null,
+//                          padding: EdgeInsets.fromLTRB(10, 10, 10, 10),
+//                        ),
+//                      ),
+//                      Container(
+//                        margin: EdgeInsets.only(left: 15, right: 15),
+//                        child: RaisedButton(
+//                          child: Text("ready request list"),
+//                          shape: new RoundedRectangleBorder(
+//                              borderRadius: new BorderRadius.circular(10.0)),
+//
+//                          onPressed: capHelp.initList,
+//                          // color: Colors.red,
+//                          // textColor: Colors.yellow,
+//                          padding: EdgeInsets.fromLTRB(10, 10, 10, 10),
+//                          // splashColor: Colors.grey,
+//                        ),
+//                      ),
+//                      Container(
+//                        margin: EdgeInsets.only(left: 15, right: 15),
+//                        child: RaisedButton(
+//                          child: Text("send startup commands"),
+//                          shape: new RoundedRectangleBorder(
+//                              borderRadius: new BorderRadius.circular(10.0)),
+//
+//                          onPressed: capHelp.sendStartupCommands,
+//                          // color: Colors.red,
+//                          // textColor: Colors.yellow,
+//                          padding: EdgeInsets.fromLTRB(10, 10, 10, 10),
+//                          // splashColor: Colors.grey,
+//                        ),
+//                      ),
+//                      Text(
+//                        otherDisplay ?? "No Bluetooth Device Selected",
+//                        style: Theme.of(context).textTheme.display1,
+//                      ),
+
+              new Expanded(
+                child: new Align(
+                    alignment: Alignment.bottomCenter,
+                    child: Column(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: [
+                      Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            RaisedButton(
+                              child: Icon(Icons.play_circle_outline),
+                              shape: new RoundedRectangleBorder(
+                                  borderRadius:
+                                      new BorderRadius.circular(10.0)),
+                              onPressed: _connect,
+                              padding: EdgeInsets.fromLTRB(10, 10, 10, 10),
+                              // splashColor: Colors.grey,
+                            ),
+                            VerticalDivider(),
+                            RaisedButton(
+                              child: Icon(Icons.accessible_forward),
+                              shape: new RoundedRectangleBorder(
+                                  borderRadius:
+                                      new BorderRadius.circular(10.0)),
+                              onPressed: capHelp.send,
+                              padding: EdgeInsets.fromLTRB(10, 10, 10, 10),
+                              // splashColor: Colors.grey,
+                            ),
+                          ]),
+                      Divider(),
+                      RaisedButton(
+                        child: Icon(Icons.clear),
+                        shape: new RoundedRectangleBorder(
+                            borderRadius:
+                            new BorderRadius.circular(10.0)),
+                        onPressed: (){capHelp.stop = true; var dataBase = Provider.of<DataBase>(context); dataBase.clear(); },
+                        padding: EdgeInsets.fromLTRB(10, 10, 10, 10),
+                        // splashColor: Colors.grey,
+                      ),
+                          Divider(),
+                    ])),
+              ),
+            ])),
+          ),
+
+          // This trailing comma makes auto-formatting nicer for build methods.
         ));
   }
 }

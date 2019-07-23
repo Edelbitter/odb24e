@@ -8,9 +8,8 @@ import 'dart:convert';
 import 'main.dart';
 
 class SettingsPage extends StatefulWidget {
-  SettingsPage({Key key, this.title}) : super(key: key);
-
-  final String title;
+  SettingsPage({Key key, }) : super(key: key);
+  //final String title;
 
   @override
   SettingsState createState() => SettingsState();
@@ -19,13 +18,15 @@ class SettingsPage extends StatefulWidget {
 class SettingsState extends State<SettingsPage> {
 
   var bonded;
+  var capHelp;
 
+  SettingsState();
 
   @override
   initState() {
 
   setState(() {
-    bonded = capHelp.bondedDevices;
+
   });
 
   }
@@ -34,6 +35,8 @@ class SettingsState extends State<SettingsPage> {
 
   @override
   Widget build(BuildContext context) {
+    capHelp = ModalRoute.of(context).settings.arguments;
+    bonded = capHelp.bondedDevices;
     return Container(
       decoration: BoxDecoration(
         image: DecorationImage(
@@ -75,13 +78,13 @@ class SettingsState extends State<SettingsPage> {
                       ),
                     ),
                     DropdownButton<BluetoothDevice>(
-                      value: theDevice ,
+                      value: capHelp.theDevice ,
                       hint: Text('select a device'),
                       onChanged: (BluetoothDevice newValue) {
                         setState(() {
-                          theDevice = newValue;
-                          otherDisplay = theDevice.name + ' *new';
-                          capHelp.prefs.setString('btDevice',theDevice.name);
+                          capHelp.theDevice = newValue;
+                           otherDisplay = capHelp.theDevice.name ;
+                          capHelp.prefs.setString('btDevice',capHelp.theDevice.name);
                         });
                       },
                       items: capHelp.bondedDevices

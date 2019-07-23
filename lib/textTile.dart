@@ -28,7 +28,7 @@ class TextTileState extends State<TextTile>
   TextTileState(this.ident){}
   var dtState = new DisplayTileState();
   String ident;// = 'AAA';
-  String data = 'tescht';
+  String data = '      ';
   String unit;
 
 

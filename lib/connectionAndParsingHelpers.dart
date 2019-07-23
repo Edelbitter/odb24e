@@ -16,7 +16,6 @@ import 'package:flutter_bluetooth_serial/flutter_bluetooth_serial.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-
 import 'dart:io';
 import 'dart:convert';
 import 'dart:math';
@@ -32,59 +31,76 @@ import 'consumption.dart';
 
 class CapHelp {
   CapHelp(this.theContext);
+  FlutterBluetoothSerial bluetooth = FlutterBluetoothSerial.instance;
+  var btConnection;
+  BluetoothDevice theDevice;
 
   int initcount = 0;
   Function dataUpdated;
   BuildContext theContext;
   bool ready = true;
+  bool stop = false;
   String recData = '';
   List<BluetoothDevice> bondedDevices = [];
   SharedPreferences prefs;
 
+  initBT({Function callback}) {
 
-  initBT({Function callback})
-  {
+    bluetooth.onStateChanged().listen((state) {
+      print('state changed');
+      print(state);
+    });
     bluetooth.getBondedDevices().then((dev) {
       bondedDevices = dev;
       SharedPreferences.getInstance().then((pre) {
         prefs = pre;
         var savedDev = prefs.getString('btDevice');
-        if(savedDev != null)
-        {
-          theDevice = bondedDevices.firstWhere((b)=>b.name == savedDev,orElse: ()=> null);
+        if (savedDev != null) {
+          theDevice = bondedDevices.firstWhere((b) => b.name == savedDev,
+              orElse: () => null);
           print(theDevice.name);
-          if(callback != null)callback();
+          if (callback != null) callback();
           //  return dev;
         }
       });
     });
   }
 
-  void connect(Function callback) {
+  void connect(Function callback, Function onConnectionLoss,
+      Function onTryingAgain) async {
     print(theDevice.connected);
 
-    bluetooth.onStateChanged().listen((state) {
-      print('state changed');
-      print(state);
-    });
+    onTryingAgain();
 
     try {
-      BluetoothConnection.toAddress(theDevice.address).then((connection) {
-        print('Connected to the device');
-        callback();
-        btConnection = connection;
-        initcount = 1;
+      var connection = await BluetoothConnection.toAddress(theDevice.address);
+      // .then((connection) {
+      print('yay Connected to the device');
+      callback();
+      btConnection = connection;
+      initcount = 1;
 
-        connection.input.listen(dataHandler, onError: (err) {
-          print('cannot connect');
-          print(err.toString());
-        }).onDone(() {
-          print('Disconnected by remote request');
-        });
-        // sendOut('atz');
+      new Timer(new Duration(milliseconds: 500), () {
+        sendStartupCommands();
+
+        // also starts requests
+        initList();
+      });
+
+      connection.input.listen(dataHandler, onError: (err) {
+        print('cannot connect');
+        print(err.toString());
+        onConnectionLoss();
+      }).onDone(() {
+        print('Disconnected by remote request');
+        onConnectionLoss();
       });
     } catch (exception) {
       print('Cannot connect, exception occured');
+      print('trying again');
+      onTryingAgain();
+      new Timer(new Duration(milliseconds: 500),
+          () => connect(callback, onConnectionLoss, onTryingAgain));
     }
   }
 
@@ -96,7 +112,8 @@ class CapHelp {
     List<Tup> shortList = new List();
 
     for (int i = 0; i < allRequests.length; ++i) {
-      requestList.add(new Tup(primes[i], allRequests.keys.toList()[i].replaceRange(0, 1, '2')));
+      requestList.add(new Tup(
+          primes[i], allRequests.keys.toList()[i].replaceRange(0, 1, '2')));
     }
     shortList.addAll(requestList); // make a copy of original list
     int maxMultiplier = requestList.last.prio;
@@ -114,17 +131,16 @@ class CapHelp {
 
     int last = requestList.indexOf(shortList.last);
     requestList = requestList.sublist(0, last + 1);
-    justRequests = shortList;//allRequests.values.toList();
-    i=0;
-    j=0;
+    justRequests = shortList; //allRequests.values.toList();
+    i = 0;
+    j = 0;
     sendOut('');
 
     // for (var el in requestList) print(el.id);
     startRequests();
   }
 
-  sendStartupCommands()
-  {
+  sendStartupCommands() {
     var dur = new Duration(milliseconds: 1000);
     new Timer(dur, () {
       print('timer start');
@@ -137,16 +153,14 @@ class CapHelp {
             sendOut('ath1'); // headers on
             new Timer(dur, () {
               sendOut('ats0'); // spaces off
-              new Timer(dur, ()
-              {
+              new Timer(dur, () {
                 sendOut('atstff'); // timeout
-              });    //  new Timer(dur, startRequests);
+              }); //  new Timer(dur, startRequests);
             });
           });
         });
       });
     });
-
   }
 
   void sendOut(String toSend) {
@@ -166,59 +180,57 @@ class CapHelp {
   var justRequests;
 
   void startRequests() {
-
-      new Timer(dur, () {
-        if(!ready) {
-          print('waiting');
-          sendOut('');
-          startRequests();
-        }
-        else{
+    if(stop){stop = false; return;}
+    new Timer(dur, () {
+      if (!ready) {
+        print('waiting');
+        sendOut('');
+        startRequests();
+      } else {
         print('requesting ' + justRequests[i].id);
-          sendOut(justRequests[i++].id.trim());
+        sendOut(justRequests[i++].id.trim());
         if (i >= allRequests.length) {
           furtherRequests();
         } else
           startRequests();
-      }});
+      }
+    });
   }
 
   void furtherRequests() {
-
-      new Timer(dur, () {
-        if(!ready) {
-          print('waiting');
-          sendOut('');
-          furtherRequests();
-        }
-        else{
-          sendOut(requestList[j++].id);
+    if(stop){stop = false; return;}
+    new Timer(dur, () {
+      if (!ready) {
+        print('waiting');
+        sendOut('');
+        furtherRequests();
+      } else {
+        sendOut(requestList[j++].id);
         if (j >= requestList.length) {
           j = 0;
         }
         furtherRequests();
-      }});
+      }
+    });
   }
 
   void dataHandler(data) {
-
     if (data != null) {
       String rec = (new String.fromCharCodes(data));
-print(rec);
+      print(rec);
       if (!recData.contains(">")) {
         recData += rec.trim();
       } else {
         ready = true;
 
-
         if (recData.length > 5 && recData.substring(0, 3) == '7EC') {
           if (recData.substring(5, 7) == '7F') {
-          print('no data');
-          //return;
+            print('no data');
+            //return;
+          } else if (recData.substring(5, 7) == '62') {
+            parseReceived(recData.substring(5, 11), recData);
+          }
         }
-        else if (recData.substring(5, 7) == '62') {
-          parseReceived(recData.substring(5, 11), recData);
-        }}
         recData = rec.trim();
       }
     }
@@ -229,8 +241,10 @@ print(rec);
     var def = allRequests[ident];
     int from = ((int.parse(def[1]) - 24) ~/ 4) + 11;
     int to = ((int.parse(def[2]) + 1 - 24) ~/ 4) + 11;
+    String valueString;
+    try {
+      valueString = rec.substring(from, to);
 
-    var valueString = rec.substring(from, to );
     double value = _convert1Hex(valueString).toDouble();
     print(value);
     print(double.parse(def[3]));
@@ -240,6 +254,7 @@ print(rec);
 
     dataBase.add(ident, new DoubleData(value, DateTime.now()));
     //dataBase.notifyListeners();
+    }catch(e){}
   }
 
   int _convert1Hex(String hex) {
@@ -258,7 +273,6 @@ print(rec);
   }
 
   int _convertHexDigit(String hex) {
-
     switch (hex) {
       case '0':
         return 0;
@@ -295,6 +309,43 @@ print(rec);
       default:
         return 0;
     }
+  }
+  var rand = new Random();
+  void send() {
+    if(stop){stop = false; return;}
+    new Timer(new Duration(milliseconds: 500), () {
+      var nextIndex =
+      allRequests.keys.toList()[rand.nextInt(allRequests.length)];
+      print(nextIndex);
+      print('sending');
+      String nextData = '7EC03' +
+          nextIndex +
+          rand.nextInt(10).toString() +
+          rand.nextInt(10).toString() +
+          rand.nextInt(10).toString() +
+          rand.nextInt(10).toString() +
+          rand.nextInt(10).toString() +
+          rand.nextInt(10).toString() +
+          rand.nextInt(10).toString() +
+          rand.nextInt(10).toString() +
+          rand.nextInt(10).toString() +
+          rand.nextInt(10).toString() +
+          rand.nextInt(10).toString() +
+          rand.nextInt(10).toString() +
+          rand.nextInt(10).toString() +
+          rand.nextInt(10).toString() +
+          rand.nextInt(10).toString() +
+          rand.nextInt(10).toString() +
+          rand.nextInt(10).toString() +
+          rand.nextInt(10).toString() +
+          rand.nextInt(10).toString() +
+          rand.nextInt(10).toString() +
+          rand.nextInt(10).toString() +
+          '>';
+      print(nextData);
+      sendTestData(nextData);
+      send();
+    });
   }
 
   sendTestData(String testData) {
