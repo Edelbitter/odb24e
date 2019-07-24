@@ -20,11 +20,8 @@ class BatteryState extends State<BatteryPage> {
   @override
   initState() {}
 
-
   @override
   Widget build(BuildContext context) {
-
-
     return Scaffold(
         backgroundColor: Colors.grey,
         appBar: AppBar(
@@ -47,26 +44,22 @@ class BatteryState extends State<BatteryPage> {
             // mainAxisSpacing: 2.0,
             // crossAxisSpacing: 2.0,
             children: <Widget>[
-              Center(child:Text("Battery Temperature")),
+              Center(child: Text("Battery Temperature")),
               LineChartTile('622001'),
               TextTile('622001'),
-
-              Center(child:Text("State of Charge")),
+              Center(child: Text("State of Charge")),
               LineChartTile('622002'),
               TextTile('622002'),
-
-              Center(child:Text("Battery Health")),
-              Center(child:Text("Battery Voltage")),
-              Center(child:Text("Battery Current")),
-
+              Center(child: Text("Battery Health")),
+              Center(child: Text("Battery Voltage")),
+              Center(child: Text("Battery Current")),
               TextTile('623206'),
               TextTile('623203'),
               TextTile('623204'),
-      Center(child:Text("12V Charger")),
-              TextTile('623022'),
+              Center(child: Text("12V Battery")),
+             // TextTile('623022'),
+              Text(''),
               TextTile('622005'),
-
-
             ],
             staggeredTiles: const <StaggeredTile>[
               const StaggeredTile.count(12, 1),
@@ -82,11 +75,8 @@ class BatteryState extends State<BatteryPage> {
               const StaggeredTile.count(4, 3),
               const StaggeredTile.count(4, 3),
               const StaggeredTile.count(4, 1),
+              const StaggeredTile.count(6, 4),
               const StaggeredTile.count(4, 3),
-              const StaggeredTile.count(4, 3),
-
-
-
             ],
           ),
         ));

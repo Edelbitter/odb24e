@@ -2,6 +2,8 @@ import 'dart:collection';
 import 'package:flutter/foundation.dart';
 import 'package:obd24e/pieChartTile.dart';
 
+import 'allRequests.dart';
+
 class DataBase extends ChangeNotifier {
 
   int bufferSize = 10;
@@ -13,46 +15,53 @@ DataBase()
 }
 
 void initRaw(){
-  rawData ={
-    // battery temperature
-    '622001':  new Queue<DoubleData>(),
-    // SoC
-    '622002':new Queue<DoubleData>(),
-    '622003':new Queue<DoubleData>(),
-    // distance
-    '622006':new Queue<DoubleData>(),
-    '62200E':new Queue<DoubleData>(),
-    '622051':new Queue<DoubleData>(),
-    '623307':new Queue<DoubleData>(),
-    '6234CF':new Queue<DoubleData>(),
-    '623478':new Queue<DoubleData>(),
-    '623459':new Queue<DoubleData>(),
-    '623457':new Queue<DoubleData>(),
-    '623456':new Queue<DoubleData>(),
-    '623455':new Queue<DoubleData>(),
-    '623454':new Queue<DoubleData>(),
-    '623454':new Queue<DoubleData>(),
-    '623451':new Queue<DoubleData>(),
-    '623458':new Queue<DoubleData>(),
-    '6233A7':new Queue<DoubleData>(),
-    '623414':new Queue<DoubleData>(),
-    // SoH
-    '623206': new Queue<DoubleData>(),
-    // voltage?
-    '622004': new Queue<DoubleData>(),
-    // voltage?
-    '623203':new Queue<DoubleData>(),
-    // current?
-    '623204':new Queue<DoubleData>(),
-    // torque?
-    '622243': new Queue<DoubleData>(),
-    // power available for climate
-    '6234C8': new Queue<DoubleData>(),
-    // DCDC On/off
-    '623022': new Queue<DoubleData>(),
-    // 14V
-    '622005': new Queue<DoubleData>(),
-  };
+  rawData = new Map<String,Queue<DoubleData>>();
+
+  for(var key in allRequests.keys){
+    rawData[key]= new Queue<DoubleData>();
+  }
+
+
+//  rawData ={
+//    // battery temperature
+//    '622001':  new Queue<DoubleData>(),
+//    // SoC
+//    '622002':new Queue<DoubleData>(),
+//    '622003':new Queue<DoubleData>(),
+//    // distance
+//    '622006':new Queue<DoubleData>(),
+//    '62200E':new Queue<DoubleData>(),
+//    '622051':new Queue<DoubleData>(),
+//    '623307':new Queue<DoubleData>(),
+//    '6234CF':new Queue<DoubleData>(),
+//    '623478':new Queue<DoubleData>(),
+//    '623459':new Queue<DoubleData>(),
+//    '623457':new Queue<DoubleData>(),
+//    '623456':new Queue<DoubleData>(),
+//    '623455':new Queue<DoubleData>(),
+//    '623454':new Queue<DoubleData>(),
+//    '623454':new Queue<DoubleData>(),
+//    '623451':new Queue<DoubleData>(),
+//    '623458':new Queue<DoubleData>(),
+//    '6233A7':new Queue<DoubleData>(),
+//    '623414':new Queue<DoubleData>(),
+//    // SoH
+//    '623206': new Queue<DoubleData>(),
+//    // voltage?
+//    '622004': new Queue<DoubleData>(),
+//    // voltage?
+//    '623203':new Queue<DoubleData>(),
+//    // current?
+//    '623204':new Queue<DoubleData>(),
+//    // torque?
+//    '622243': new Queue<DoubleData>(),
+//    // power available for climate
+//    '6234C8': new Queue<DoubleData>(),
+//    // DCDC On/off
+//    '623022': new Queue<DoubleData>(),
+//    // 14V
+//    '622005': new Queue<DoubleData>(),
+//  };
 }
 
 
