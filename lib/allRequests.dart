@@ -34,6 +34,7 @@
 // ];
 
 Map<String,List<String>> allRequests = {
+'623204':['7ec','24','39','1','32768','0','A','223204','623204','ff','HV LBC current measure'],
 '622243':['7ec','24','39','0.03125','32768','0','N.m','222243','622243','ff','Final effective torque request to the electric motor (EM)'],
 '622003':['7ec','24', '39', '0.01', '0', '0', 'km/h', '222003', '622003', 'ff', 'Vehicle speed'],
 '622051':['7ec','31', '31', '1', '0', '0', '', '222051', '622051', 'ff', 'Displayed vehicle speed unit', '0:km/h;1:mph'],
@@ -44,7 +45,6 @@ Map<String,List<String>> allRequests = {
 '623458':['7ec','24', '39', '1', '0','0', 'km', '223458', '623458', 'ff', 'Temporary estimated minimum kilometric cruising range sent to MMI'],
 '622006':['7ec','24', '47', '1', '0', '0', 'km', '222006', '622006', 'ff', 'Total vehicle distance'],
 '623307':['7ec','24', '31', '1', '40', '0', '°C', '223307', '623307', 'ff','Heat water temperature'],
-'623204':['7ec','24','39','1','32768','0','A','223204','623204','ff','HV LBC current measure'],
 '622001':['7ec','24', '31', '1', '40', '0', '°C', '222001', '622001', 'ff', 'Battery Rack temperature'],
 '623203':['7ec','24','39','0.5','0','0','V','223203','623203','ff','HV LBC voltage measure'],
 '622004':['7ec','24','39','0.5','0','0','V','222004','622004','ff','consolidated HV voltage'],

@@ -91,9 +91,9 @@ class _MyHomePageState extends State<MyHomePage> {
       });
     });
     // initBt();
-  //  var dataBase = Provider.of<DataBase>(context);
-  //  if(dataBase==null)
-     // dataBase.initRaw();
+    //  var dataBase = Provider.of<DataBase>(context);
+    //  if(dataBase==null)
+    // dataBase.initRaw();
   }
 
   void errorHandler(error, StackTrace trace) {
@@ -129,8 +129,6 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   Widget build(BuildContext context) {
-
-
     return Container(
         decoration: BoxDecoration(
           image: DecorationImage(
@@ -193,18 +191,18 @@ class _MyHomePageState extends State<MyHomePage> {
               Divider(),
               Divider(),
 
-//                  Container(
+                  Container(
 
-//                    child: TextFormField(
-//                      textDirection: TextDirection.ltr,
-//                      onFieldSubmitted: (res) {
-//                        userInput = res;
-//                      },
-//                      decoration: InputDecoration(
-//                        border: OutlineInputBorder(),
-//                      ),
-//                    ),
-//                  ),
+                    child: TextFormField(
+                      textDirection: TextDirection.ltr,
+                      onFieldSubmitted: (res) {
+                        userInput = res;
+                      },
+                      decoration: InputDecoration(
+                        border: OutlineInputBorder(),
+                      ),
+                    ),
+                  ),
 //                  RaisedButton(
 //                    child: Text("Dashboard"),
 //                    shape: new RoundedRectangleBorder(
@@ -260,20 +258,20 @@ class _MyHomePageState extends State<MyHomePage> {
                 padding: EdgeInsets.fromLTRB(10, 10, 10, 10),
               ),
 
-//                      Container(
-//                        margin: EdgeInsets.only(left: 15, right: 15),
-//                        child: RaisedButton(
-//                          child: Text("send custom"),
-//                          shape: new RoundedRectangleBorder(
-//                              borderRadius: new BorderRadius.circular(10.0)),
-//                          onPressed: (userInput != null)
-//                              ? () {
-//                                  capHelp.sendOut(userInput.trim());
-//                                }
-//                              : null,
-//                          padding: EdgeInsets.fromLTRB(10, 10, 10, 10),
-//                        ),
-//                      ),
+                      Container(
+                        margin: EdgeInsets.only(left: 15, right: 15),
+                        child: RaisedButton(
+                          child: Text("send custom"),
+                          shape: new RoundedRectangleBorder(
+                              borderRadius: new BorderRadius.circular(10.0)),
+                          onPressed: (userInput != null)
+                              ? () {
+                                  capHelp.sendOut(userInput.trim());
+                                }
+                              : null,
+                          padding: EdgeInsets.fromLTRB(10, 10, 10, 10),
+                        ),
+                      ),
 //                      Container(
 //                        margin: EdgeInsets.only(left: 15, right: 15),
 //                        child: RaisedButton(
@@ -313,41 +311,44 @@ class _MyHomePageState extends State<MyHomePage> {
                     child: Column(
                         mainAxisAlignment: MainAxisAlignment.end,
                         children: [
-                      Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            RaisedButton(
-                              child: Icon(Icons.play_circle_outline),
-                              shape: new RoundedRectangleBorder(
-                                  borderRadius:
-                                      new BorderRadius.circular(10.0)),
-                              onPressed: _connect,
-                              padding: EdgeInsets.fromLTRB(10, 10, 10, 10),
-                              // splashColor: Colors.grey,
-                            ),
-                            VerticalDivider(),
-                            RaisedButton(
-                              child: Icon(Icons.accessible_forward),
-                              shape: new RoundedRectangleBorder(
-                                  borderRadius:
-                                      new BorderRadius.circular(10.0)),
-                              onPressed: capHelp.send,
-                              padding: EdgeInsets.fromLTRB(10, 10, 10, 10),
-                              // splashColor: Colors.grey,
-                            ),
-                          ]),
-                      Divider(),
-                      RaisedButton(
-                        child: Icon(Icons.clear),
-                        shape: new RoundedRectangleBorder(
-                            borderRadius:
-                            new BorderRadius.circular(10.0)),
-                        onPressed: (){capHelp.stop = true; var dataBase = Provider.of<DataBase>(context); dataBase.clear(); },
-                        padding: EdgeInsets.fromLTRB(10, 10, 10, 10),
-                        // splashColor: Colors.grey,
-                      ),
+                          Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                RaisedButton(
+                                  child: Icon(Icons.play_circle_outline),
+                                  shape: new RoundedRectangleBorder(
+                                      borderRadius:
+                                          new BorderRadius.circular(10.0)),
+                                  onPressed: _connect,
+                                  padding: EdgeInsets.fromLTRB(10, 10, 10, 10),
+                                  // splashColor: Colors.grey,
+                                ),
+                                VerticalDivider(),
+                                RaisedButton(
+                                  child: Icon(Icons.accessible_forward),
+                                  shape: new RoundedRectangleBorder(
+                                      borderRadius:
+                                          new BorderRadius.circular(10.0)),
+                                  onPressed: capHelp.send,
+                                  padding: EdgeInsets.fromLTRB(10, 10, 10, 10),
+                                  // splashColor: Colors.grey,
+                                ),
+                              ]),
                           Divider(),
-                    ])),
+                          RaisedButton(
+                            child: Icon(Icons.clear),
+                            shape: new RoundedRectangleBorder(
+                                borderRadius: new BorderRadius.circular(10.0)),
+                            onPressed: () {
+                              capHelp.stop = true;
+                              var dataBase = Provider.of<DataBase>(context);
+                              dataBase.clear();
+                            },
+                            padding: EdgeInsets.fromLTRB(10, 10, 10, 10),
+                            // splashColor: Colors.grey,
+                          ),
+                          Divider(),
+                        ])),
               ),
             ])),
           ),

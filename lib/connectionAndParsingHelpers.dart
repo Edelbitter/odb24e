@@ -45,7 +45,6 @@ class CapHelp {
   SharedPreferences prefs;
 
   initBT({Function callback}) {
-
     bluetooth.onStateChanged().listen((state) {
       print('state changed');
       print(state);
@@ -82,7 +81,7 @@ class CapHelp {
 
       new Timer(new Duration(milliseconds: 500), () {
         sendStartupCommands();
-
+// nopeee
         // also starts requests
         initList();
       });
@@ -180,7 +179,10 @@ class CapHelp {
   var justRequests;
 
   void startRequests() {
-    if(stop){stop = false; return;}
+    if (stop) {
+      stop = false;
+      return;
+    }
     new Timer(dur, () {
       if (!ready) {
         print('waiting');
@@ -198,7 +200,10 @@ class CapHelp {
   }
 
   void furtherRequests() {
-    if(stop){stop = false; return;}
+    if (stop) {
+      stop = false;
+      return;
+    }
     new Timer(dur, () {
       if (!ready) {
         print('waiting');
@@ -245,16 +250,16 @@ class CapHelp {
     try {
       valueString = rec.substring(from, to);
 
-    double value = _convert1Hex(valueString).toDouble();
-    print(value);
-    print(double.parse(def[3]));
-    value = value * double.parse(def[3]);
-    value = value - double.parse(def[4]);
-    print(value);
+      double value = _convert1Hex(valueString).toDouble();
+      print(value);
+      print(double.parse(def[3]));
+      value = value * double.parse(def[3]);
+      value = value - double.parse(def[4]);
+      print(value);
 
-    dataBase.add(ident, new DoubleData(value, DateTime.now()));
-    //dataBase.notifyListeners();
-    }catch(e){}
+      dataBase.add(ident, new DoubleData(value, DateTime.now()));
+      //dataBase.notifyListeners();
+    } catch (e) {}
   }
 
   int _convert1Hex(String hex) {
@@ -310,12 +315,16 @@ class CapHelp {
         return 0;
     }
   }
+
   var rand = new Random();
   void send() {
-    if(stop){stop = false; return;}
+    if (stop) {
+      stop = false;
+      return;
+    }
     new Timer(new Duration(milliseconds: 500), () {
       var nextIndex =
-      allRequests.keys.toList()[rand.nextInt(allRequests.length)];
+          allRequests.keys.toList()[rand.nextInt(allRequests.length)];
       print(nextIndex);
       print('sending');
       String nextData = '7EC03' +
