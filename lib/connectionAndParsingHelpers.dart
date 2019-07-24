@@ -45,10 +45,7 @@ class CapHelp {
   SharedPreferences prefs;
 
   initBT({Function callback}) {
-    bluetooth.onStateChanged().listen((state) {
-      print('state changed');
-      print(state);
-    });
+    initList();
     bluetooth.getBondedDevices().then((dev) {
       bondedDevices = dev;
       SharedPreferences.getInstance().then((pre) {
@@ -67,6 +64,14 @@ class CapHelp {
 
   void connect(Function callback, Function onConnectionLoss,
       Function onTryingAgain) async {
+    bluetooth.onStateChanged().listen((state) {
+      print('state changed');
+      print(state);
+      if(state == BluetoothState.STATE_OFF){
+        onConnectionLoss();
+        stop = true;
+      }
+    });
     print(theDevice.connected);
 
     onTryingAgain();
@@ -80,18 +85,22 @@ class CapHelp {
       initcount = 1;
 
       new Timer(new Duration(milliseconds: 500), () {
-        sendStartupCommands();
+        sendStartupCommands(startRequests);
 // nopeee
+        //startRequests();
+
         // also starts requests
-        initList();
+
       });
 
       connection.input.listen(dataHandler, onError: (err) {
         print('cannot connect');
         print(err.toString());
+        stop = true;
         onConnectionLoss();
       }).onDone(() {
         print('Disconnected by remote request');
+        stop = true;
         onConnectionLoss();
       });
     } catch (exception) {
@@ -133,15 +142,12 @@ class CapHelp {
     justRequests = shortList; //allRequests.values.toList();
     i = 0;
     j = 0;
-    sendOut('');
-
     // for (var el in requestList) print(el.id);
-    startRequests();
   }
 
-  sendStartupCommands() {
+  void sendStartupCommands(Function after) async {
     var dur = new Duration(milliseconds: 1000);
-    new Timer(dur, () {
+     new Timer(dur, () {
       print('timer start');
       sendOut('atz'); // reset ELM327
       new Timer(dur, () {
@@ -153,7 +159,10 @@ class CapHelp {
             new Timer(dur, () {
               sendOut('ats0'); // spaces off
               new Timer(dur, () {
-                sendOut('atstff'); // timeout
+                sendOut('atstff');
+                sendOut('');
+                after();
+                // timeout
               }); //  new Timer(dur, startRequests);
             });
           });
@@ -253,8 +262,8 @@ class CapHelp {
       double value = _convert1Hex(valueString).toDouble();
       print(value);
       print(double.parse(def[3]));
-      value = value * double.parse(def[3]);
       value = value - double.parse(def[4]);
+      value = value * double.parse(def[3]);
       print(value);
 
       dataBase.add(ident, new DoubleData(value, DateTime.now()));

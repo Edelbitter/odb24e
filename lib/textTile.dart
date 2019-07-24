@@ -13,57 +13,59 @@ import 'package:provider/provider.dart';
 import 'database.dart';
 import 'allRequests.dart';
 
-
 class TextTile extends StatefulWidget {
-
   String ident;
 
-  TextTile(this.ident){}
+  TextTile(this.ident) {}
   @override
   TextTileState createState() => TextTileState(ident);
 }
 
-class TextTileState extends State<TextTile>
-{
-  TextTileState(this.ident){}
+class TextTileState extends State<TextTile> {
+  TextTileState(this.ident) {}
   var dtState = new DisplayTileState();
-  String ident;// = 'AAA';
+  String ident; // = 'AAA';
   String data = '      ';
   String unit;
 
-
   @override
-  Widget build(BuildContext context)
-  {
+  Widget build(BuildContext context) {
     var dataBase = Provider.of<DataBase>(context);
 
-    if(dataBase.rawData[ident].length>0)
-    data = dataBase.rawData[ident].last.data.toStringAsFixed(1);
-    unit = allRequests[ident][6];
+    if (ident == 'consum') {
+      var dat = (dataBase.getConsumption() );
+      data = (dat > 0 ? dat : 0).toStringAsFixed(1);
+      unit = 'kW';
+    }
+    else if(ident == 'recup'){
+      var dat = (dataBase.getConsumption() *-1);
+      data = (dat > 0 ? dat : 0).toStringAsFixed(1);
+      unit = 'kW';
+    }
+    else {
+      if (dataBase.rawData[ident].length > 0)
+        data = dataBase.rawData[ident].last.data.toStringAsFixed(1);
+      unit = allRequests[ident][6];
+    }
     return dtState.buildOuter(getDisplay());
   }
 
+  dynamic getDisplay() {
+    var row = [
+      Text(
+        data ?? 'null',
+        style: TextStyle(inherit: false, fontSize: 180, color: Colors.black87),
+      )
+    ];
+    if (unit != null) {
+      row.add(Text(unit,
+          style: TextStyle(inherit: false, fontSize: 50, color: Colors.black)));
+    }
 
-  dynamic getDisplay()
-  {
-    var row = [Text(
-      data ?? 'null',
-      style: TextStyle(
-          inherit: false, fontSize: 180, color: Colors.black87),
-    )];
-    if(unit != null)
-      {
-        row.add(Text(unit,
-            style: TextStyle(
-                inherit: false, fontSize: 50, color: Colors.black)));
-      }
-
-
-    return Consumer<DataBase>(builder: (context,dataBase,child)=>
-      FittedBox(
-        fit: BoxFit.fitWidth,
-        child: Container(
-            alignment: Alignment.bottomCenter,
-            child: Row(children: row))));
+    return Consumer<DataBase>(
+        builder: (context, dataBase, child) => FittedBox(
+            fit: BoxFit.fitWidth,
+            child: Container(
+                alignment: Alignment.bottomCenter, child: Row(children: row))));
   }
 }

@@ -103,16 +103,18 @@ class _MyHomePageState extends State<MyHomePage> {
   void _connect() {
     capHelp.connect(() {
       setState(() {
-        otherDisplay += ' connected';
+        otherDisplay = capHelp.theDevice.name + ' connected';
         connected = 1;
       });
     }, () {
       setState(() {
         connected = 0;
+        otherDisplay = capHelp.theDevice.name;
       });
     }, () {
       setState(() {
         connected = 2;
+        otherDisplay = capHelp.theDevice.name + ' connecting...';
       });
     });
   }
@@ -191,18 +193,17 @@ class _MyHomePageState extends State<MyHomePage> {
               Divider(),
               Divider(),
 
-                  Container(
-
-                    child: TextFormField(
-                      textDirection: TextDirection.ltr,
-                      onFieldSubmitted: (res) {
-                        userInput = res;
-                      },
-                      decoration: InputDecoration(
-                        border: OutlineInputBorder(),
-                      ),
-                    ),
+              Container(
+                child: TextFormField(
+                  textDirection: TextDirection.ltr,
+                  onFieldSubmitted: (res) {
+                    userInput = res;
+                  },
+                  decoration: InputDecoration(
+                    border: OutlineInputBorder(),
                   ),
+                ),
+              ),
 //                  RaisedButton(
 //                    child: Text("Dashboard"),
 //                    shape: new RoundedRectangleBorder(
@@ -258,20 +259,20 @@ class _MyHomePageState extends State<MyHomePage> {
                 padding: EdgeInsets.fromLTRB(10, 10, 10, 10),
               ),
 
-                      Container(
-                        margin: EdgeInsets.only(left: 15, right: 15),
-                        child: RaisedButton(
-                          child: Text("send custom"),
-                          shape: new RoundedRectangleBorder(
-                              borderRadius: new BorderRadius.circular(10.0)),
-                          onPressed: (userInput != null)
-                              ? () {
-                                  capHelp.sendOut(userInput.trim());
-                                }
-                              : null,
-                          padding: EdgeInsets.fromLTRB(10, 10, 10, 10),
-                        ),
-                      ),
+              Container(
+                margin: EdgeInsets.only(left: 15, right: 15),
+                child: RaisedButton(
+                  child: Text("send custom"),
+                  shape: new RoundedRectangleBorder(
+                      borderRadius: new BorderRadius.circular(10.0)),
+                  onPressed: (userInput != null)
+                      ? () {
+                          capHelp.sendOut(userInput.trim());
+                        }
+                      : null,
+                  padding: EdgeInsets.fromLTRB(10, 10, 10, 10),
+                ),
+              ),
 //                      Container(
 //                        margin: EdgeInsets.only(left: 15, right: 15),
 //                        child: RaisedButton(

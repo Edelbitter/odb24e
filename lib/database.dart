@@ -69,14 +69,21 @@ void initRaw(){
   List<DoubleData> soC = new List<DoubleData>();
 
   List<DoubleData> consumAirCon;// = rawData['2233A7'].toList();
-  List<DoubleData> consumDrive = new List<DoubleData>();
+  //List<DoubleData> consumDrive = new List<DoubleData>();
  // List<DoubleData> consumHeat = new List<DoubleData>();
   List<DoubleData> consum12V = new List<DoubleData>();
+
+  double getConsumption()
+  {
+    if(rawData['623204'].length>0 && rawData['623203'].length>0)
+      return -1 * rawData['623204'].last.data * rawData['623203'].last.data / 1000;
+    return 0;
+  }
 
   List<ComboDataPiece> getCombo() {
     var comboData = new List<ComboDataPiece>();
     consumAirCon = rawData['6233A7'].toList();
-    consumDrive = rawData['623459'].toList();
+    double consumDrive = getConsumption()> 0 ? (getConsumption()-consumAirCon.last.data > 0 ? getConsumption()-consumAirCon.last.data :0) : 0;
 
   //  if (consumHeat.length > 0)
   //    comboData.add(new ComboDataPiece('AC', consumHeat.last.data ?? 0));
@@ -85,15 +92,15 @@ void initRaw(){
     if (consumAirCon.length > 0)
       comboData.add(new ComboDataPiece('AC', consumAirCon.last.data ?? 0));
     else
-      comboData.add(new ComboDataPiece('AC', 111));
+      comboData.add(new ComboDataPiece('AC', 0));
    // if (consum12V.length > 0)
    //   comboData.add(new ComboDataPiece('Heat', consum12V.last.data ?? 0));
    // else
    //   comboData.add(new ComboDataPiece('Heat', 111));
-    if (consumDrive.length > 0)
-      comboData.add(new ComboDataPiece('Drive', consumDrive.last.data ?? 0));
-    else
-      comboData.add(new ComboDataPiece('Drive', 111));
+   // if (consumDrive.length > 0)
+      comboData.add(new ComboDataPiece('Drive', consumDrive));
+   // else
+    //  comboData.add(new ComboDataPiece('Drive', 0));
 
     return comboData;
   }

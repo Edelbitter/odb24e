@@ -34,9 +34,9 @@
 // ];
 
 Map<String,List<String>> allRequests = {
-'623204':['7ec','24','39','1','32768','0','A','223204','623204','ff','HV LBC current measure'],
-'622243':['7ec','24','39','0.03125','32768','0','N.m','222243','622243','ff','Final effective torque request to the electric motor (EM)'],
+'623204':['7ec','24','39','0.25','32768','0','A','223204','623204','ff','HV LBC current measure'],
 '622003':['7ec','24', '39', '0.01', '0', '0', 'km/h', '222003', '622003', 'ff', 'Vehicle speed'],
+'622243':['7ec','24','39','0.03125','32768','0','N.m','222243','622243','ff','Final effective torque request to the electric motor (EM)'],
 '622051':['7ec','31', '31', '1', '0', '0', '', '222051', '622051', 'ff', 'Displayed vehicle speed unit', '0:km/h;1:mph'],
 '6233A7':['7ec','24', '31','25',  '0', '0', 'W', '2233A7', '6233A7', 'ff', 'AC compressor Power Consumption Estimation'],
 '622002':['7ec','24', '39', '0.02', '0', '0', '%', '222002', '622002', 'ff', 'State Of Charge (SOC) HV battery'],

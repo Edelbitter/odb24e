@@ -20,11 +20,8 @@ class DrivingState extends State<DrivingPage> {
   @override
   initState() {}
 
-
   @override
   Widget build(BuildContext context) {
-
-
     return Scaffold(
         backgroundColor: Colors.grey,
         appBar: AppBar(
@@ -47,25 +44,41 @@ class DrivingState extends State<DrivingPage> {
             // mainAxisSpacing: 2.0,
             // crossAxisSpacing: 2.0,
             children: <Widget>[
-              Center(child:Text("Power Consumption")),
-              LineChartTile('623459'),
-              TextTile('623459'),
+              Center(child: Text("Current Consumption")),
+           //   Text(''),
+              TextTile('consum'),
+            //  Text(''),
 
-              Center(child:Text("Remaining Range")),
+              Center(child: Text("Speed")),
+           //   Text(''),
+              TextTile('622003'),
+            //  Text(''),
+
+              Center(child: Text("Average Consumption")),
+              LineChartTile('623459'),TextTile('623459'),
+              Center(child: Text("Remaining Range")),
               LineChartTile('623458'),
               TextTile('623458'),
 
-              Center(child:Text("Speed")),
-              Center(child:Text("Torque")),
-              Center(child:Text("Distance")),
-
-              TextTile('622003'),
-              TextTile('622243'),
-              TextTile('622006'),
-
-
+//              Center(child: Text("Speed")),
+//              Center(child: Text("Torque")),
+//              Center(child: Text("Distance")),
+//
+//              TextTile('622003'),
+//              TextTile('622243'),
+//              TextTile('622006'),
             ],
             staggeredTiles: const <StaggeredTile>[
+             // const StaggeredTile.count(12, 1),
+              const StaggeredTile.count(4, 4),
+              const StaggeredTile.count(8, 4),
+            //  const StaggeredTile.count(2, 4),
+          //    const StaggeredTile.count(12, 1),
+              const StaggeredTile.count(4, 4),
+              const StaggeredTile.count(8, 4),
+            //  const StaggeredTile.count(2, 4),
+
+
               const StaggeredTile.count(12, 1),
               const StaggeredTile.count(8, 3),
               const StaggeredTile.count(4, 3),
@@ -78,9 +91,6 @@ class DrivingState extends State<DrivingPage> {
               const StaggeredTile.count(4, 3),
               const StaggeredTile.count(4, 3),
               const StaggeredTile.count(4, 3),
-
-
-
             ],
           ),
         ));
