@@ -8,7 +8,9 @@ import 'dart:convert';
 import 'main.dart';
 
 class SettingsPage extends StatefulWidget {
-  SettingsPage({Key key, }) : super(key: key);
+  SettingsPage({
+    Key key,
+  }) : super(key: key);
   //final String title;
 
   @override
@@ -16,7 +18,6 @@ class SettingsPage extends StatefulWidget {
 }
 
 class SettingsState extends State<SettingsPage> {
-
   var bonded;
   var capHelp;
 
@@ -24,14 +25,8 @@ class SettingsState extends State<SettingsPage> {
 
   @override
   initState() {
-
-  setState(() {
-
-  });
-
+    setState(() {});
   }
-
-
 
   @override
   Widget build(BuildContext context) {
@@ -67,42 +62,42 @@ class SettingsState extends State<SettingsPage> {
               // Port
               Container(
                 margin: EdgeInsets.only(top: 15, right: 15),
-                decoration: new BoxDecoration(border: Border.all(color: Colors.white)),
+                decoration:
+                    new BoxDecoration(border: Border.all(color: Colors.white)),
                 child: Row(
                   children: <Widget>[
                     Center(
                       child: Container(
-                        margin: EdgeInsets.only(left: 15, right: 20,top:15),
+                        margin: EdgeInsets.only(left: 15, right: 20, top: 15),
                         padding: EdgeInsets.only(bottom: 15),
                         child: Text('Bluetooth Device:'),
                       ),
                     ),
                     DropdownButton<BluetoothDevice>(
-                      value: capHelp.theDevice ,
+                      value: capHelp.theDevice,
                       hint: Text('select a device'),
                       onChanged: (BluetoothDevice newValue) {
                         setState(() {
                           capHelp.theDevice = newValue;
-                           otherDisplay = capHelp.theDevice.name ;
-                          capHelp.prefs.setString('btDevice',capHelp.theDevice.name);
+                          otherDisplay = capHelp.theDevice.name;
+                          capHelp.prefs
+                              .setString('btDevice', capHelp.theDevice.name);
                         });
                       },
                       items: capHelp.bondedDevices
-                          .map<DropdownMenuItem<BluetoothDevice>>((BluetoothDevice value) {
+                          .map<DropdownMenuItem<BluetoothDevice>>(
+                              (BluetoothDevice value) {
                         return DropdownMenuItem<BluetoothDevice>(
                           value: value,
                           child: Text(value.name),
                         );
                       }).toList(),
                     ),
-
                   ],
                 ),
               ),
 
               // IP
-
-
             ],
           ),
         ),

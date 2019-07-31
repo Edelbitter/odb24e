@@ -86,11 +86,6 @@ class CapHelp {
 
       new Timer(new Duration(milliseconds: 500), () {
         sendStartupCommands(startRequests);
-// nopeee
-        //startRequests();
-
-        // also starts requests
-
       });
 
       connection.input.listen(dataHandler, onError: (err) {
@@ -145,7 +140,7 @@ class CapHelp {
     // for (var el in requestList) print(el.id);
   }
 
-  void sendStartupCommands(Function after) async {
+  void sendStartupCommands(Function after)  {
     var dur = new Duration(milliseconds: 1000);
      new Timer(dur, () {
       print('timer start');
@@ -208,6 +203,11 @@ class CapHelp {
     });
   }
 
+  void log(){
+    var dataBase = Provider.of<DataBase>(theContext);
+    dataBase.exportData();
+  }
+
   void furtherRequests() {
     if (stop) {
       stop = false;
@@ -260,11 +260,11 @@ class CapHelp {
       valueString = rec.substring(from, to);
 
       double value = _convert1Hex(valueString).toDouble();
-      print(value);
-      print(double.parse(def[3]));
+      //print(value);
+      //print(double.parse(def[3]));
       value = value - double.parse(def[4]);
       value = value * double.parse(def[3]);
-      print(value);
+      //print(value);
 
       dataBase.add(ident, new DoubleData(value, DateTime.now()));
       //dataBase.notifyListeners();
@@ -273,8 +273,8 @@ class CapHelp {
 
   int _convert1Hex(String hex) {
     if (hex == null) return 0;
-    print('converting');
-    print(hex);
+    //print('converting');
+    //print(hex);
 
     int result = 0;
     for (int i = 0; i < hex.length; ++i) {
@@ -334,8 +334,8 @@ class CapHelp {
     new Timer(new Duration(milliseconds: 500), () {
       var nextIndex =
           allRequests.keys.toList()[rand.nextInt(allRequests.length)];
-      print(nextIndex);
-      print('sending');
+     // print(nextIndex);
+      //print('sending');
       String nextData = '7EC03' +
           nextIndex +
           rand.nextInt(10).toString() +
@@ -360,7 +360,7 @@ class CapHelp {
           rand.nextInt(10).toString() +
           rand.nextInt(10).toString() +
           '>';
-      print(nextData);
+    //  print(nextData);
       sendTestData(nextData);
       send();
     });

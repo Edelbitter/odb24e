@@ -93,9 +93,11 @@ class DisplayTileState extends State<DisplayTile> {
 
   Widget buildOuter(Widget inner)
   {
-    return InkWell(
+    return
+      //InkWell(
       // onLongPress: () => {_displayDialog(context)},
-      child: Container(
+    //  child:
+    Container(
         margin: const EdgeInsets.all(2.0),
         padding: EdgeInsets.all(3),
         child: inner,
@@ -103,24 +105,25 @@ class DisplayTileState extends State<DisplayTile> {
             color: Colors.white,
             border: Border.all(
                 color: Colors.black, width: 2, style: BorderStyle.solid)),
-      ),
+     // ),
     );
   }
 
   @override
   Widget build(BuildContext context) {
-    return InkWell(
-      // onLongPress: () => {_displayDialog(context)},
-      child: Container(
-        margin: const EdgeInsets.all(2.0),
-        padding: EdgeInsets.all(3),
-        child: _getDisplay(),
-        decoration: BoxDecoration(
-            color: Colors.white,
-            border: Border.all(
-                color: Colors.black, width: 2, style: BorderStyle.solid)),
-      ),
-    );
+    return buildOuter(Text(''));
+//    return InkWell(
+//      // onLongPress: () => {_displayDialog(context)},
+//      child: Container(
+//        margin: const EdgeInsets.all(2.0),
+//        padding: EdgeInsets.all(3),
+//        child: _getDisplay(),
+//        decoration: BoxDecoration(
+//            color: Colors.white,
+//            border: Border.all(
+//                color: Colors.black, width: 2, style: BorderStyle.solid)),
+//      ),
+//    );
   }
 
   dynamic _getDisplay() {

@@ -1,26 +1,46 @@
 import 'dart:collection';
 import 'package:flutter/foundation.dart';
 import 'package:obd24e/pieChartTile.dart';
+import 'dart:async';
+import 'dart:convert';
 
 import 'allRequests.dart';
 
+import 'package:f_logs/constants/constants.dart';
+import 'package:f_logs/constants/db_constants.dart';
+import 'package:f_logs/data/local/app_database.dart';
+import 'package:f_logs/data/local/flog_dao.dart';
+import 'package:f_logs/model/datalog/data_log_type.dart';
+import 'package:f_logs/model/flog/flog.dart';
+import 'package:f_logs/model/flog/flog_config.dart';
+import 'package:f_logs/model/flog/log.dart';
+import 'package:f_logs/model/flog/log_level.dart';
+import 'package:f_logs/utils/filters/filters.dart';
+import 'package:f_logs/utils/formatter/formate_type.dart';
+import 'package:f_logs/utils/formatter/formatter.dart';
+import 'package:f_logs/utils/storage/logs_storage.dart';
+import 'package:f_logs/utils/timestamp/timestamp_format.dart';
+
 class DataBase extends ChangeNotifier {
+  int bufferSize = 30;
 
-  int bufferSize = 10;
+  Map<String, Queue<DoubleData>> rawData;
+  DataBase() {
+    initRaw();
+    LogsConfig con = new LogsConfig();
 
-Map<String,Queue<DoubleData>> rawData;
-DataBase()
-{
-  initRaw();
-}
-
-void initRaw(){
-  rawData = new Map<String,Queue<DoubleData>>();
-
-  for(var key in allRequests.keys){
-    rawData[key]= new Queue<DoubleData>();
+   // FLog.clearLogs();
+   // con.formatType = FormatType.FORMAT_CSV;
+    FLog.applyConfigurations(con);
+    log();
   }
 
+  void initRaw() {
+    rawData = new Map<String, Queue<DoubleData>>();
+
+    for (var key in allRequests.keys) {
+      rawData[key] = new Queue<DoubleData>();
+    }
 
 //  rawData ={
 //    // battery temperature
@@ -62,44 +82,56 @@ void initRaw(){
 //    // 14V
 //    '622005': new Queue<DoubleData>(),
 //  };
-}
+  }
 
+  Future exportData() async {
+
+
+    await FLog.exportLogs();
+
+  }
 
   List<DoubleData> batteryTemperatures = new List<DoubleData>();
   List<DoubleData> soC = new List<DoubleData>();
 
-  List<DoubleData> consumAirCon;// = rawData['2233A7'].toList();
+  List<DoubleData> consumAirCon; // = rawData['2233A7'].toList();
   //List<DoubleData> consumDrive = new List<DoubleData>();
- // List<DoubleData> consumHeat = new List<DoubleData>();
+  // List<DoubleData> consumHeat = new List<DoubleData>();
   List<DoubleData> consum12V = new List<DoubleData>();
 
-  double getConsumption()
-  {
-    if(rawData['623204'].length>0 && rawData['623203'].length>0)
-      return -1 * rawData['623204'].last.data * rawData['623203'].last.data / 1000;
+  double getConsumption() {
+    if (rawData['623204'].length > 0 && rawData['623203'].length > 0)
+      return -1 *
+          rawData['623204'].last.data *
+          rawData['623203'].last.data /
+          1000;
     return 0;
   }
 
   List<ComboDataPiece> getCombo() {
     var comboData = new List<ComboDataPiece>();
     consumAirCon = rawData['6233A7'].toList();
-    double consumDrive = getConsumption()> 0 ? (getConsumption()-consumAirCon.last.data > 0 ? getConsumption()-consumAirCon.last.data :0) : 0;
+    double consumDrive = getConsumption() > 0
+        ? (getConsumption() - consumAirCon.last.data > 0
+            ? getConsumption() - consumAirCon.last.data
+            : 0)
+        : 0;
 
-  //  if (consumHeat.length > 0)
-  //    comboData.add(new ComboDataPiece('AC', consumHeat.last.data ?? 0));
- //   else
- //     comboData.add(new ComboDataPiece('AC', 111));
+    //  if (consumHeat.length > 0)
+    //    comboData.add(new ComboDataPiece('AC', consumHeat.last.data ?? 0));
+    //   else
+    //     comboData.add(new ComboDataPiece('AC', 111));
     if (consumAirCon.length > 0)
       comboData.add(new ComboDataPiece('AC', consumAirCon.last.data ?? 0));
     else
       comboData.add(new ComboDataPiece('AC', 0));
-   // if (consum12V.length > 0)
-   //   comboData.add(new ComboDataPiece('Heat', consum12V.last.data ?? 0));
-   // else
-   //   comboData.add(new ComboDataPiece('Heat', 111));
-   // if (consumDrive.length > 0)
-      comboData.add(new ComboDataPiece('Drive', consumDrive));
-   // else
+    // if (consum12V.length > 0)
+    //   comboData.add(new ComboDataPiece('Heat', consum12V.last.data ?? 0));
+    // else
+    //   comboData.add(new ComboDataPiece('Heat', 111));
+    // if (consumDrive.length > 0)
+    comboData.add(new ComboDataPiece('Drive', consumDrive));
+    // else
     //  comboData.add(new ComboDataPiece('Drive', 0));
 
     return comboData;
@@ -107,21 +139,39 @@ void initRaw(){
 
 //  DataBase() ;
 
-  void add(String ident,DoubleData data)
-  {
-
+  void add(String ident, DoubleData data) {
     rawData[ident].add(data);
-    if(rawData[ident].length>bufferSize)
-      rawData[ident].removeFirst();
+    if (rawData[ident].length > bufferSize) rawData[ident].removeFirst();
     //print(rawData[ident].map((ff) => ff.data));
+    log();
     notifyListeners();
   }
 
-  void clear(){
-
+  void clear() {
     initRaw();
-
+    log();
     notifyListeners();
+  }
+
+  void log(){
+    FLog.clearLogs();
+    FLog.logThis(
+      // className: "HomePage",
+      // methodName: "_buildRow1",
+        text: getString(),
+        type: LogLevel.INFO);
+  }
+
+  String getString(){
+    String result = '';
+    for(var k in rawData.keys.toList()){
+      if(rawData[k].length>0) {
+        result += k + ' ' + allRequests[k][10] + '\n';
+
+        result += rawData[k].join('\n') + '\n' + '\n';
+      }
+    }
+    return result;
   }
 
 //  factory DataBase.withFakeData() {
@@ -166,4 +216,9 @@ class DoubleData {
   DoubleData(this.data, this.time) {}
   double data;
   DateTime time;
+
+  @override
+  String toString(){
+    return '${data.toStringAsFixed(2)} / ${time}';
+  }
 }

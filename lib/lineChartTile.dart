@@ -12,46 +12,41 @@ import 'displayTiles.dart';
 import 'database.dart';
 import 'package:provider/provider.dart';
 
-
 class LineChartTile extends StatefulWidget {
-
   String ident;
 
-  LineChartTile(this.ident){}
+  LineChartTile(this.ident) {}
 
   @override
   LineChartState createState() => LineChartState(ident);
 }
 
-class LineChartState extends State<LineChartTile>
-{
-  LineChartState(this.ident){}
+class LineChartState extends State<LineChartTile> {
+  LineChartState(this.ident) {}
 
   var dtState = new DisplayTileState();
   String ident;
   var data;
 
-
   @override
-  Widget build(BuildContext context)
-  {
+  Widget build(BuildContext context) {
     var dataBase = Provider.of<DataBase>(context);
     data = dataBase.rawData[ident];
 
     return dtState.buildOuter(getDisplay());
   }
 
-
-  dynamic getDisplay()
-  {
-    return Consumer<DataBase>(builder: (context,dataBase,child)=>
-      charts.TimeSeriesChart(
-     [new charts.Series<DoubleData, DateTime>(
-      id: 'Battery',
-      colorFn: (_, __) => charts.MaterialPalette.blue.shadeDefault,
-      domainFn: (DoubleData dat, _) => dat.time,
-      measureFn: (DoubleData dat, _) => dat.data,
-      data: data.toList(),
-    )]));
+  dynamic getDisplay() {
+    return Consumer<DataBase>(
+        builder: (context, dataBase, child) => charts.TimeSeriesChart([
+              new charts.Series<DoubleData, DateTime>(
+                id: 'Battery',
+                colorFn: (_, __) => charts.MaterialPalette.blue.shadeDefault,
+                domainFn: (DoubleData dat, _) => dat.time,
+                measureFn: (DoubleData dat, _) => dat.data,
+                data: data.toList(),
+              )
+            ])
+    );
   }
 }

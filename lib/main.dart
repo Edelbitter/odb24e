@@ -193,17 +193,17 @@ class _MyHomePageState extends State<MyHomePage> {
               Divider(),
               Divider(),
 
-              Container(
-                child: TextFormField(
-                  textDirection: TextDirection.ltr,
-                  onFieldSubmitted: (res) {
-                    userInput = res;
-                  },
-                  decoration: InputDecoration(
-                    border: OutlineInputBorder(),
-                  ),
-                ),
-              ),
+//              Container(
+//                child: TextFormField(
+//                  textDirection: TextDirection.ltr,
+//                  onFieldSubmitted: (res) {
+//                    userInput = res;
+//                  },
+//                  decoration: InputDecoration(
+//                    border: OutlineInputBorder(),
+//                  ),
+//                ),
+//              ),
 //                  RaisedButton(
 //                    child: Text("Dashboard"),
 //                    shape: new RoundedRectangleBorder(
@@ -259,20 +259,21 @@ class _MyHomePageState extends State<MyHomePage> {
                 padding: EdgeInsets.fromLTRB(10, 10, 10, 10),
               ),
 
-              Container(
-                margin: EdgeInsets.only(left: 15, right: 15),
-                child: RaisedButton(
-                  child: Text("send custom"),
-                  shape: new RoundedRectangleBorder(
-                      borderRadius: new BorderRadius.circular(10.0)),
-                  onPressed: (userInput != null)
-                      ? () {
-                          capHelp.sendOut(userInput.trim());
-                        }
-                      : null,
-                  padding: EdgeInsets.fromLTRB(10, 10, 10, 10),
-                ),
-              ),
+//              Container(
+//                margin: EdgeInsets.only(left: 15, right: 15),
+//                child: RaisedButton(
+//                  child: Text("send custom"),
+//                  shape: new RoundedRectangleBorder(
+//                      borderRadius: new BorderRadius.circular(10.0)),
+//                  onPressed: (userInput != null)
+//                      ? () {
+//                          capHelp.sendOut(userInput.trim());
+//
+//                        }
+//                      : null,
+//                  padding: EdgeInsets.fromLTRB(10, 10, 10, 10),
+//                ),
+//              ),
 //                      Container(
 //                        margin: EdgeInsets.only(left: 15, right: 15),
 //                        child: RaisedButton(
@@ -336,6 +337,8 @@ class _MyHomePageState extends State<MyHomePage> {
                                 ),
                               ]),
                           Divider(),
+                          Row(mainAxisAlignment: MainAxisAlignment.center,
+                              children:[
                           RaisedButton(
                             child: Icon(Icons.clear),
                             shape: new RoundedRectangleBorder(
@@ -348,6 +351,18 @@ class _MyHomePageState extends State<MyHomePage> {
                             padding: EdgeInsets.fromLTRB(10, 10, 10, 10),
                             // splashColor: Colors.grey,
                           ),
+                            VerticalDivider(),
+                            RaisedButton(
+                              child: Icon(Icons.receipt),
+                              shape: new RoundedRectangleBorder(
+                                  borderRadius: new BorderRadius.circular(10.0)),
+                              onPressed: () {
+                                capHelp.log();
+                              },
+                              padding: EdgeInsets.fromLTRB(10, 10, 10, 10),
+                              // splashColor: Colors.grey,
+                            ),
+                          ]),
                           Divider(),
                         ])),
               ),
