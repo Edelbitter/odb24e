@@ -40,6 +40,8 @@ class CapHelp {
   BuildContext theContext;
   bool ready = true;
   bool stop = false;
+  bool receiving = false;
+  bool generatingDummy = false;
   String recData = '';
   List<BluetoothDevice> bondedDevices = [];
   SharedPreferences prefs;
@@ -64,12 +66,15 @@ class CapHelp {
 
   void connect(Function callback, Function onConnectionLoss,
       Function onTryingAgain) async {
+    stop = false;
+    receiving =  true;
     bluetooth.onStateChanged().listen((state) {
       print('state changed');
       print(state);
       if(state == BluetoothState.STATE_OFF){
         onConnectionLoss();
         stop = true;
+        receiving = false;
       }
     });
     print(theDevice.connected);
@@ -92,10 +97,12 @@ class CapHelp {
         print('cannot connect');
         print(err.toString());
         stop = true;
+        receiving = false;
         onConnectionLoss();
       }).onDone(() {
         print('Disconnected by remote request');
         stop = true;
+        receiving = false;
         onConnectionLoss();
       });
     } catch (exception) {
@@ -141,6 +148,8 @@ class CapHelp {
   }
 
   void sendStartupCommands(Function after)  {
+    i=0;
+    j=0;
     var dur = new Duration(milliseconds: 1000);
      new Timer(dur, () {
       print('timer start');
@@ -183,8 +192,11 @@ class CapHelp {
   var justRequests;
 
   void startRequests() {
+    print(stop);
+    print('starting req');
     if (stop) {
       stop = false;
+      receiving = false;
       return;
     }
     new Timer(dur, () {
@@ -210,6 +222,7 @@ class CapHelp {
 
   void furtherRequests() {
     if (stop) {
+      receiving = false;
       stop = false;
       return;
     }
@@ -327,8 +340,10 @@ class CapHelp {
 
   var rand = new Random();
   void send() {
+    generatingDummy = true;
     if (stop) {
       stop = false;
+      generatingDummy = false;
       return;
     }
     new Timer(new Duration(milliseconds: 500), () {

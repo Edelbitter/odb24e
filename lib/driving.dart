@@ -54,8 +54,8 @@ class DrivingState extends State<DrivingPage> {
               TextTile('622003'),
             //  Text(''),
 
-              Center(child: Text("Average Consumption")),
-              LineChartTile('623459'),TextTile('623459'),
+              Center(child: Text("Torque")),
+              LineChartTile('622243'),TextTile('622243'),
               Center(child: Text("Remaining Range")),
               LineChartTile('623458'),
               TextTile('623458'),

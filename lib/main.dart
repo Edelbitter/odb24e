@@ -169,7 +169,7 @@ class _MyHomePageState extends State<MyHomePage> {
                         icon: Icon(Icons.bluetooth),
                         onPressed: () {},
                       ),
-                      Text(otherDisplay ?? ''),
+                      Text(otherDisplay ?? 'No Device!'),
                       //  IconButton(icon: Icon(Icons.search), onPressed: () {},),
                     ],
                   ),
@@ -321,7 +321,7 @@ class _MyHomePageState extends State<MyHomePage> {
                                   shape: new RoundedRectangleBorder(
                                       borderRadius:
                                           new BorderRadius.circular(10.0)),
-                                  onPressed: _connect,
+                                  onPressed:  capHelp.generatingDummy == false && capHelp.receiving == false ?  _connect : null,
                                   padding: EdgeInsets.fromLTRB(10, 10, 10, 10),
                                   // splashColor: Colors.grey,
                                 ),
@@ -331,7 +331,7 @@ class _MyHomePageState extends State<MyHomePage> {
                                   shape: new RoundedRectangleBorder(
                                       borderRadius:
                                           new BorderRadius.circular(10.0)),
-                                  onPressed: capHelp.send,
+                                  onPressed: capHelp.receiving == false && capHelp.generatingDummy == false ? capHelp.send : null,
                                   padding: EdgeInsets.fromLTRB(10, 10, 10, 10),
                                   // splashColor: Colors.grey,
                                 ),
